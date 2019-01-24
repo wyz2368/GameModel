@@ -167,6 +167,10 @@ def isDAG(G):
 def getEdges(G):
     return G.edges()
 
+def getnumANDnodes(G):
+
+
+
 
 # test
 # G = daggenerator_wo_attrs([1,2,3],[(1,2),(1,3)])
@@ -182,6 +186,7 @@ def assignAttr_E(G,edge,attr):
 
 def attrGenerator(num_nodes,num_edges,num_attr_N,num_attr_E,num_targets,num_root):
     # Hard coding
+    #
 
 
 
