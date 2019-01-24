@@ -167,8 +167,33 @@ def isDAG(G):
 def getEdges(G):
     return G.edges()
 
-def getnumANDnodes(G):
+def get_num_ANDnodes(G):
+    count = 0
+    for node in G.nodes:
+        if G.nodes[node]['eType'] == 1:
+            count += 1
+    return count
 
+def get_num_Targets(G):
+    count = 0
+    for node in G.nodes:
+        if G.nodes[node]['type'] == 1:
+            count += 1
+    return count
+
+def get_num_Roots(G):
+    count = 0
+    for node in G.nodes:
+        if G.nodes[node]['root'] == 1:
+            count += 1
+    return count
+
+def get_num_NormalEdges(G):
+    count = 0
+    for edge in G.edges:
+        if G.edges[edge]['type'] == 0:
+            count += 1
+    return count
 
 
 
@@ -184,7 +209,7 @@ def assignAttr_N(G,id,attr): #add code to check the lenth match
 def assignAttr_E(G,edge,attr):
     G.edges[edge].update(dict(zip(G.nodes[id].keys(),attr)))
 
-def attrGenerator(num_nodes,num_edges,num_attr_N,num_attr_E,num_targets,num_root):
+def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 4,num_targets = 1,num_root = 1):
     # Hard coding
     #
 

@@ -21,3 +21,5 @@ b = G.edges[(1,2)].keys()
 G.edges[(1,2)].update(dict(zip(b,a)))
 print(G.edges[1,2])
 
+print(G.nodes)
+
