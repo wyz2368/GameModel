@@ -1,4 +1,5 @@
 import networkx as nx
+import random
 import numpy as np
 
 G = nx.DiGraph()
@@ -14,12 +15,16 @@ print(nx.is_directed_acyclic_graph(G))
 # dict=dict.fromkeys(d,)
 # print(dict)
 
-A = np.random.random((3,3))
+# A = np.random.random((3,3))
+#
+# a = A[1,:]
+# b = G.edges[(1,2)].keys()
+# G.edges[(1,2)].update(dict(zip(b,a)))
+# print(G.edges[1,2])
+#
+# print(G.nodes)
 
-a = A[1,:]
-b = G.edges[(1,2)].keys()
-G.edges[(1,2)].update(dict(zip(b,a)))
-print(G.edges[1,2])
-
-print(G.nodes)
+a = (1,2)
+print(isinstance(a,list))
+print(random.uniform(0,1))
 

@@ -174,19 +174,23 @@ def get_num_ANDnodes(G):
             count += 1
     return count
 
-def get_num_Targets(G):
+def get_Targets(G):
     count = 0
+    targetset = set()
     for node in G.nodes:
         if G.nodes[node]['type'] == 1:
             count += 1
-    return count
+            targetset.add(node)
+    return count,targetset
 
-def get_num_Roots(G):
+def get_Roots(G):
     count = 0
+    rootset = set()
     for node in G.nodes:
         if G.nodes[node]['root'] == 1:
             count += 1
-    return count
+            rootset.add(node)
+    return count,rootset
 
 def get_num_NormalEdges(G):
     count = 0
@@ -197,10 +201,7 @@ def get_num_NormalEdges(G):
 
 
 
-# test
-# G = daggenerator_wo_attrs([1,2,3],[(1,2),(1,3)])
-# print(G.nodes.data())
-# print(G.edges.data())
+
 
 # Attributes Initialization
 def assignAttr_N(G,id,attr): #add code to check the lenth match
