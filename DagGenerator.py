@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 
 num_attr_N = 12
-num_attr_E = 4
+num_attr_E = 5
 
 def daggenerator_wo_attrs(nodeset,edgeset):
     G = nx.DiGraph()
@@ -21,6 +21,7 @@ def daggenerator_wo_attrs(nodeset,edgeset):
                      topoPosition = -1)
 
     G.add_edges_from(edgeset,
+                     eid = -1,
                      type = 0, #0:NORMAL 1:VIRTUAL
                      cost = 0, # Cost for attacker on OR node
                      weight = 0.0,
@@ -108,6 +109,8 @@ def setposInactiveProb_N(G,id,value):
 
 # Edge Operations
 # Get Info
+def getid_E(G,edge):
+    return G.edges[edge]['eid']
 
 def getType_E(G,edge):
     return G.edges[edge]['type']
@@ -122,6 +125,9 @@ def getweight_E(G,edge):
     return G.edges[edge]['weight']
 
 # Set Info
+
+def setid_E(G, edge, value):
+    G.edges[edge]['eid'] = value
 
 def setType_E(G,edge,value):
      G.edges[edge]['type'] = value
@@ -208,9 +214,9 @@ def assignAttr_N(G,id,attr): #add code to check the lenth match
     G.nodes[id].update(dict(zip(G.nodes[id].keys(),attr)))
 
 def assignAttr_E(G,edge,attr):
-    G.edges[edge].update(dict(zip(G.nodes[id].keys(),attr)))
+    G.edges[edge].update(dict(zip(G.edges[edge].keys(),attr)))
 
-def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 4,num_targets = 1,num_root = 1):
+def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 5,num_targets = 1,num_root = 1):
     # Hard coding
     #
 
