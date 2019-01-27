@@ -45,66 +45,6 @@ def get_att_isActive(G):
     return isActive
 
 
-def get_att_canAttack(G):
-    canAttack = []
-    _,Andnodeset = dag.get_ANDnodes(G)
-    for andnode in Andnodeset:
-        precondflag = 1
-        precond = dag.predecessors(G,andnode)
-        for prenode in precond:
-            if G.nodes[prenode]['state'] == 0:
-                precondflag = 0
-                break
-        if G.nodes[andnode]['state'] == 0 and precondflag:
-            canAttack.append(1)
-        else:
-            canAttack.append(0)
-
-    oredgeset = dag.get_ORedges(G)
-    for (father,son) in oredgeset:
-        if G.nodes[father]['state'] == 1 and G.nodes[son]['state'] == 0:
-            canAttack.append(1)
-        else:
-            canAttack.append(0)
-
-    return canAttack
-
-
-
-
-def get_att_canAttack_inAttackSet(G,attact):
-    canAttack = []
-    inAttackSet = []
-    _, Andnodeset = dag.get_ANDnodes(G)
-    for andnode in Andnodeset:
-        if andnode in attact:
-            inAttackSet.append(1)
-        else:
-            inAttackSet.append(0)
-        precondflag = 1
-        precond = dag.predecessors(G, andnode)
-        for prenode in precond:
-            if G.nodes[prenode]['state'] == 0:
-                precondflag = 0
-                break
-        if G.nodes[andnode]['state'] == 0 and precondflag:
-            canAttack.append(1)
-        else:
-            canAttack.append(0)
-
-    oredgeset = dag.get_ORedges(G)
-    for (father, son) in oredgeset:
-        if (father, son) in attact:
-            inAttackSet.append(1)
-        else:
-            inAttackSet.append(0)
-        if G.nodes[father]['state'] == 1 and G.nodes[son]['state'] == 0:
-            canAttack.append(1)
-        else:
-            canAttack.append(0)
-
-    return canAttack, inAttackSet
-
 
 def get_def_hadAlert(G):
     alert = []
@@ -122,25 +62,6 @@ def get_def_hadAlert(G):
 
     return alert
 
-
-def get_def_wasDefended(G,defact_tm1):
-    wasdef = []
-    for node in G.nodes:
-        if node in defact_tm1:
-            wasdef.append(1)
-        else:
-            wasdef.append(0)
-    return wasdef
-
-
-def get_def_inDefenseSet(G,defact):
-    indef = []
-    for node in G.nodes:
-        if node in defact:
-            indef.append(1)
-        else:
-            indef.append(0)
-    return indef
 
 
 def reset(G_reserved):
