@@ -4,8 +4,8 @@ import numpy as np
 num_attr_N = 12
 num_attr_E = 5
 
-def daggenerator_wo_attrs(nodeset,edgeset):
-    G = nx.DiGraph()
+def daggenerator_wo_attrs(nodeset,edgeset,T,graphid):
+    G = nx.DiGraph(horizon = T, id = graphid)
     G.add_nodes_from(nodeset,
                      root = 0, #0:NONROOT 1:ROOTNODE
                      type = 0,# 0:NONTARGET 1:TARGET
@@ -32,6 +32,17 @@ def daggenerator_wo_attrs(nodeset,edgeset):
 
 def isProb(p):
     return p >= 0.0 and p <= 1.0
+
+def sortEdge(edgeset):
+    sorted_by_first_second = sorted(edgeset, key=lambda tup: (tup[0], tup[1]))
+    return sorted_by_first_second
+
+# Graph Operation
+def getHorizon_G(G):
+    return G.graph['horizon']
+
+def setHorizon_G(G,value):
+    G.graph['horizon'] = value
 
 # Node Operations
 # Get Info
@@ -173,12 +184,31 @@ def isDAG(G):
 def getEdges(G):
     return G.edges()
 
-def get_num_ANDnodes(G):
+def get_ANDnodes(G):
     count = 0
+    Andset = set()
     for node in G.nodes:
         if G.nodes[node]['eType'] == 1:
             count += 1
-    return count
+            Andset.add(node)
+    return count, Andset
+
+def get_ORnodes(G):
+    count = 0
+    Orset = set()
+    for node in G.nodes:
+        if G.nodes[node]['eType'] == 0:
+            count += 1
+            Orset.add(node)
+    return count, Orset
+
+def get_ORedges(G):
+    ornodes = get_ORnodes(G)
+    oredges = []
+    for node in ornodes:
+        oredges.append(G.in_edges(node))
+    oredges = sortEdge(oredges)
+    return oredges
 
 def get_Targets(G):
     count = 0
@@ -216,7 +246,7 @@ def assignAttr_N(G,id,attr): #add code to check the lenth match
 def assignAttr_E(G,edge,attr):
     G.edges[edge].update(dict(zip(G.edges[edge].keys(),attr)))
 
-def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 5,num_targets = 1,num_root = 1):
+#def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 5,num_targets = 1,num_root = 1):
     # Hard coding
     #
 
