@@ -103,3 +103,12 @@ class Attacker():
                 canAttack.append(0)
 
         return canAttack, inAttackSet
+
+    def uniform_strategy(self,G):
+        actmask = self.get_att_canAttack(G)
+        ANDnodes = list(dag.get_ANDnodes(G))
+        ORedges = dag.get_ORedges(G)
+        attSet = ANDnodes + ORedges
+        actset_masked = list(x for x, z in zip(attSet, actmask) if z)
+        return random.choices(actset_masked,k=self.num_resource)
+

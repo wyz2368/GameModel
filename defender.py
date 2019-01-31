@@ -9,8 +9,9 @@ class Defender():
     defact_tm1 = set()
     timeleft = 10
 
-    def __init__(self,resource):
+    def __init__(self,resource,timeleft):
         self.num_resource = resource
+        self.timeleft = timeleft
 
     def def_greedy_action_builder(self, G, nn_def):
         self.defact.clear()
@@ -48,3 +49,6 @@ class Defender():
             else:
                 indef.append(0)
         return indef
+
+    def uniform_strategy(self,G):
+        return random.choices(list(G.nodes),k=self.num_resource)
