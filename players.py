@@ -9,6 +9,8 @@ def att_greedy_action_builder(G,attObs,nn_att,A):
     isLegal = 1
     # pass is indicated by -1
     x = 0
+    #Do we really need pass?
+    #The answer is no in this version
     while not isDup and isLegal and x != -1 and random.uniform(0,1) > 0.1:
         att_input = att_obs_constructor(attObs,attackSet)
         x = nn_att(att_input)
@@ -45,7 +47,8 @@ def att_obs_constructor(G,trueobs,attackSet,timeleft):
 def def_obs_constructor(G,obs,defendSet,previous_obs,timeleft,defact_tm1):
     wasdef = get_def_wasDefended(G,defact_tm1)
     indef = get_def_inDefenseSet(G,defendSet)
-    def_input = previous_obs+obs+wasdef+indef+timeleft
+    # no need for repeating timeleft, so it is not N
+    def_input = previous_obs+obs+wasdef+indef+[timeleft]
     return def_input
 
 
