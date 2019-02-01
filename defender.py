@@ -1,7 +1,7 @@
 import random
 import DagGenerator as dag
 
-class Defender():
+class Defender(object):
     num_resource = 4
     observation = []
     prev_obs = []

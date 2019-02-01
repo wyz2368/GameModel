@@ -1,7 +1,7 @@
 import random
 import DagGenerator as dag
 
-class Attacker():
+class Attacker(object):
     num_resource = 10
     max_num_attack = 10
     min_num_attack = 2
