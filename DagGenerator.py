@@ -1,36 +1,140 @@
 import networkx as nx
 import numpy as np
 import sys
+import random
+import matplotlib.pyplot as plt
 
 class Environment(object):
 
-    def __init__(self, num_attr_N=12, num_attr_E=5):
+    def __init__(self, num_attr_N=12, num_attr_E=5, T=10, graphid=1):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
-        self.G = nx.DiGraph()
-
-    def daggenerator_wo_attrs(self, nodeset,edgeset,T,graphid):
         self.G = nx.DiGraph(horizon = T, id = graphid)
+
+    def daggenerator_wo_attrs(self,nodeset,edgeset,T,graphid):
         self.G.add_nodes_from(nodeset,
-                         root = 0, #0:NONROOT 1:ROOTNODE
-                         type = 0,# 0:NONTARGET 1:TARGET
+                         root = 0, # 0:NONROOT 1:ROOTNODE
+                         type = 0, # 0:NONTARGET 1:TARGET
                          eType = 0,# 0:OR 1:AND node
                          state = 0,# 0:Inactive 1:Active
                          aReward = 0.0, # GREATER THAN OR EQUAL TO 0
                          dPenalty = 0.0, # SAME^
                          dCost = 0.0, # SAME^
                          aCost = 0.0, # SAME^
-                         posActiveProb = 1.0, #prob of sending positive signal if node is active
-                         posInactiveProb = 0.0, #prob of sending positive signal if node is inactive
-                         actProb = 1.0, #prob of becoming active if being activated, for AND node only
+                         posActiveProb = 1.0, # prob of sending positive signal if node is active
+                         posInactiveProb = 0.0, # prob of sending positive signal if node is inactive
+                         actProb = 1.0, # prob of becoming active if being activated, for AND node only
                          topoPosition = -1)
         self.G.add_edges_from(edgeset,
                          eid = -1,
-                         type = 0, #0:NORMAL 1:VIRTUAL
+                         type = 0, # 0:NORMAL 1:VIRTUAL
                          cost = 0, # Cost for attacker on OR node, GREATER THAN OR EQUAL TO 0
                          weight = 0.0,
                          actProb=1.0) # probability of successfully activating, for OR node only
         return self.G
+
+    def randomDAG(self, numNodes, numEdges, numRoot, numGoals, T, graphid, maxAReward=100, maxDPenalty=100, maxDCost=100, maxACost=100):
+    	self.G = nx.gnp_random_graph(numNodes, 1, directed=True) # Create fully connected directed Erdos-Renyi graph.
+    	self.G = nx.DiGraph([(u,v) for (u,v) in self.G.edges() if u<v], horizon = T, id = graphid) # Drop all edges (u,v) where edge u<v to enforce acyclic graph property.
+    	rootNodes = random.sample(range(1,numNodes-1),numRoot-1) # Given the parameter numRoot, pick numRoot-1 random root IDs.
+    	                                                         # Node 0 will also always be root. Last node (ID:numNodes) cannot be root node.
+    	for rootNode in rootNodes: # Out of the picked rootNodes, drop all edges (u,v) where v = rootNode.
+    		for start in range(0, rootNode):
+    			self.G.remove_edge(start, rootNode)
+    	canRemove = list(self.G.edges)
+    	while len(self.G.edges) > numEdges and len(canRemove) != 0: # Randomly delete edges until numEdges is met, or if there are no more nodes to remove.
+                                                                    # canRemove = nodes not yet removed OR nodes that once removed do not
+                                                                    # break the connected property.
+    		deleteEdge = random.choice(canRemove)
+    		self.G.remove_edge(deleteEdge[0], deleteEdge[1])
+    		if (not nx.is_connected(self.G.to_undirected())) or (len(self.G.pred[deleteEdge[1]]) == 0):
+    			self.G.add_edge(deleteEdge[0], deleteEdge[1])
+    		canRemove.remove(deleteEdge)
+
+    	# Set random graph attributes
+    	for nodeID in range(numNodes):
+    		print(self.G.pred[nodeID])
+    		if len(self.G.pred[nodeID]) == 0:
+    			self.setRoot_N(nodeID, 1)
+    			self.setType_N(nodeID, 0) # Root nodes cannot be target (goal) nodes.
+    		else:
+    			self.setRoot_N(nodeID, 0)
+    			self.setType_N(nodeID, np.random.randint(2))
+    		self.setActivationType_N(nodeID, np.random.randint(2))
+    		self.setState_N(nodeID, np.random.randint(2))
+    		self.setAReward_N(nodeID, np.random.uniform(0, maxAReward))
+    		self.setDPenalty_N(nodeID, np.random.uniform(0, maxDPenalty))
+    		self.setDCost_N(nodeID, np.random.uniform(0, maxDCost))
+    		self.setACost_N(nodeID, np.random.uniform(0, maxACost))
+    		self.setposActiveProb_N(nodeID, np.random.uniform(0, 1))
+    		self.setposInactiveProb_N(nodeID, np.random.uniform(0, 1))
+    		self.setTopoPosition_N(nodeID, -1)
+
+    	return self.G
+
+   	# Parameter Format:
+   	#		Nodes = List of N integers, representing Node IDs.
+   	# 		Edges = List of E Tuples, representing Edges.
+   	#		Nroots, Ntypes, NeTypes, Nstates, NaRewards, NdPenalties, NdCosts, NaCosts, NposActiveProbs, NposInacriveProbs, NtopoPositions: 
+   	#			Size N list. Each List[x] attribute correspondes to the node in position nodes[x].
+    def specifiedDAG(self, nodes, edges, Nroots, Ntypes, NeTypes, Nstates, NaRewards, NdPenalties, NdCosts, NaCosts, NposActiveProbs, NposInactiveProbs, NtopoPositions, Eeids, Etypes, Ecosts, Eweights, EactProbs, T, graphid):
+    	self.daggenerator_wo_attrs(nodes,edges,T,graphid)
+    	for nodeID in range(nodes):
+    		self.setRoot_N(nodeID, Nroots[nodeID])
+    		self.setType_N(nodeID, Ntypes[nodeID])
+    		self.setActivationType_N(nodeID, NeTypes[nodeID])
+    		self.setState_N(nodeID, Nstates[nodeID]) # Are all nodes inactive at the start? Or not?
+    		self.setAReward_N(nodeID, NaRewards[nodeID])
+    		self.setDPenalty_N(nodeID, NdPenalties[nodeID])
+    		self.setDCost_N(nodeID, NdCosts[nodeID])
+    		self.setACost_N(nodeID, NaCosts[nodeID])
+    		self.setposActiveProb_N(nodeID, NposActiveProbs[nodeID])
+    		self.setposInactiveProb_N(nodeID, NposInactiveProbs[nodeID])
+    		self.setTopoPosition_N(nodeID, NtopoPositions[nodeID])
+    	for edge in range(edges):
+    		self.setid_E((edges[0], edges[1]), Eeids[edge])
+    		self.setType_E((edges[0], edges[1]), Etypes[edge])
+    		self.setACost_E((edges[0], edges[1]), Ecosts[edge])
+    		self.setweight_E((edges[0], edges[1]), Eweights[edge])
+    		self.setActProb_E((edges[0], edges[1]), actProb[edge])
+    	return self.G
+
+    # Visualizes DAG
+    # Did not visualize: aReward, dPenalty, dCost, aCost, posActiveProb, posInactiveProb, actProb, topoPosition
+    def visualize(self):
+    	nodePos = nx.layout.spring_layout(self.G)
+    	# rootNodes and targetNodes cannot overlap
+    	try:
+    		rootNodes = self.get_Roots()[1]
+    		targetNodes = self.get_Targets()[1]
+    		if bool(set(rootNodes) & set(targetNodes)):
+    			raise Exception("Goal and Root nodes overlap. A Goal node cannot be a Root node, and vice versa.")
+    	except Exception as error:
+            print(repr(error))
+    	for node in self.G.nodes:
+    		# Active/Inactive color
+    		if self.getState_N(node) == 1:
+    			# Active = Green
+    			nodeColor = 'g'
+    		else:
+    			# Inactive = Red
+    			nodeColor = 'r'
+    		# And/Or Node shape
+    		if self.getActivationType_N(node) == 1:
+    			# And Nodes = ^
+    			nodeShape = '^'
+    		else:
+    			# Or Nodes = o
+    			nodeShape = 'o'
+    		# Goal Node: Size
+    		if node in targetNodes:
+    			nodeSize = 1000
+    		else:
+    			nodeSize = 300
+    		nx.draw_networkx_nodes(self.G, nodePos, node_shape=nodeShape, nodelist=[node], node_size=nodeSize, node_color=nodeColor, vmax=0.1)
+    	nx.draw_networkx_labels(self.G, nodePos)
+    	nx.draw_networkx_edges(self.G,nodePos)
+    	plt.show()
 
     def isProb(self,p):
         return p >= 0.0 and p <= 1.0
@@ -86,6 +190,15 @@ class Environment(object):
 
     # Set Info
 
+    def setRoot_N(self, id, value):
+        try:
+            if value != 0 and value != 1:
+                raise Exception("Node root value must be 0 (NONROOT) or 1 (ROOT).")
+            else:
+                self.G.nodes[id]['root'] = value
+        except Exception as error:
+            print(repr(error))
+
     def setState_N(self,id,value):
         try:
             if value != 0 and value != 1:
@@ -122,7 +235,7 @@ class Environment(object):
         except Exception as error:
             print(repr(error))
 
-    def setDPenalty_N(id,value):
+    def setDPenalty_N(self,id,value):
         try:
             if value < 0:
                 raise Exception("Node dPenalty must be greater than or equal to 0.")
@@ -136,7 +249,7 @@ class Environment(object):
             if value < 0:
                 raise Exception("Node dCost must be greater than or equal to 0.")
             else:
-                self.nodes[id]['dCost'] = value
+                self.G.nodes[id]['dCost'] = value
         except Exception as error:
             print(repr(error))
 
@@ -145,7 +258,7 @@ class Environment(object):
             if value < 0:
                 raise Exception("Node aCost must be greater than or equal to 0.")
             else:
-                self.nodes[id]['aCost'] = value
+                self.G.nodes[id]['aCost'] = value
         except Exception as error:
             print(repr(error))
 
@@ -323,5 +436,74 @@ class Environment(object):
         self.G.edges[edge].update(dict(zip(G.edges[edge].keys(),attr)))
 
 	#def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 5,num_targets = 1,num_root = 1):
-	    # Hard coding
-	    #
+	# Hard coding
+	#
+
+	### API FUNCTIONS ###
+
+    def step(self,attact,defact):
+        # immediate reward for both players
+        aReward = 0
+        dReward = 0
+        T = self.G.graph['horizon']
+        #attacker's action
+        for attack in attact:
+            if isinstance(attack,tuple):
+                #check OR node
+                aReward += self.G.edges[attack]['cost']
+                if random.uniform(0,1) <= self.G.edges[attack]['actProb']:
+                    self.G.nodes[attack[-1]]['state'] = 1
+            else:
+                #check AND node
+                aReward += self.G.nodes[attack]['aCost']
+                if random.uniform(0,1) <= self.G.nodes[attack]['actProb']:
+                    self.G.nodes[attack]['state'] = 1
+        #defender's action
+        for node in defact:
+            self.G.nodes[node]['state'] = 0
+            dReward += self.G.nodes[node]['dCost']
+        _,targetset = self.get_Targets()
+        for node in targetset:
+            if self.G.nodes[node]['state'] == 1:
+                aReward += self.G.nodes[node]['aReward']
+                dReward += self.G.nodes[node]['dPenalty']
+        #if goal node prevails for next time step
+        # return true state and obs
+        return self.get_att_isActive(),self.get_def_hadAlert(),aReward,dReward
+
+    def get_att_isActive(self):
+        isActive = []
+        for id in np.arange(self.getNumNodes()):
+            if self.G.nodes[id+1]['state'] == 1:
+                isActive.append(1)
+            else:
+                isActive.append(0)
+        return isActive
+
+    def get_def_hadAlert(self):
+        alert = []
+        for node in self.G.nodes:
+            if self.G.nodesp[node]['state'] == 1:
+                if random.uniform(0, 1) <= self.G.nodes[node]['posActiveProb']:
+                    alert.append(1)
+                else:
+                    alert.append(0)
+            elif self.G.nodesp[node]['state'] == 0:
+                if random.uniform(0, 1) <= self.G.nodes[node]['posInactiveProb']:
+                    alert.append(1)
+                else:
+                    alert.append(0)
+            else:
+                raise ValueError("node state is abnormal.")
+        return alert
+
+    #reset the environment, G_reserved is a copy of the initial env
+    def reset(self,G_reserved):
+        self.G = G_reserved.copy()
+        return self.G
+
+"""
+test = Environment()
+test.randomDAG(30, 50, 2, 1, 1, 1)
+test.visualize()
+"""
