@@ -111,4 +111,3 @@ class Attacker(object):
         attSet = ANDnodes + ORedges
         actset_masked = list(x for x, z in zip(attSet, actmask) if z)
         return random.choices(actset_masked,k=self.num_resource)
-
