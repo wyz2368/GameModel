@@ -6,10 +6,16 @@ import matplotlib.pyplot as plt
 
 class Environment(object):
 
-    def __init__(self, num_attr_N=12, num_attr_E=5, T=10, graphid=1):
+    def __init__(self, num_attr_N=12, num_attr_E=5, T=10, graphid=1, numNodes=20, numEdges=10, numRoot=3, numGoals=3):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
         self.G = nx.DiGraph(horizon = T, id = graphid)
+
+        # randomDAG parameters
+        self.numNodes = numNodes
+        self.numEdges = numEdges
+        self.numRoot = numRoot
+        self.numGoals = numGoals
 
     def daggenerator_wo_attrs(self,nodeset,edgeset,T,graphid):
         self.G.add_nodes_from(nodeset,
@@ -31,33 +37,34 @@ class Environment(object):
                          cost = 0, # Cost for attacker on OR node, GREATER THAN OR EQUAL TO 0
                          weight = 0.0,
                          actProb=1.0) # probability of successfully activating, for OR node only
-        return self.G
 
-    def randomDAG(self, numNodes, numEdges, numRoot, numGoals, T, graphid, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100, EminWeight=0, EmaxWeight=100):
+    def randomDAG(self, T, graphid, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100, EminWeight=0, EmaxWeight=100):
         # Exception handling
         try:
-            if numRoot + numGoals > numNodes:
+            if self.numRoot + self.numGoals > self.numNodes:
                 raise Exception("(Number of root nodes) + (Number of goal nodes) cannot exceed total number of nodes.")
         except Exception as error:
             print(repr(error))
             return 1
         try:
-            maxEdges = (numNodes-1)*(numNodes)/2
-            if numEdges > maxEdges:
-                raise Exception("For a graph with " + str(numNodes) + " nodes, there can be a maximum of " + str(int(maxEdges)) + " edges.")
+            maxEdges = (self.numNodes-1)*(self.numNodes)/2
+            if self.numEdges > maxEdges:
+                raise Exception("For a graph with " + str(self.numNodes) + " nodes, there can be a maximum of " + str(int(maxEdges)) + " edges.")
         except Exception as error:
             print(repr(error))
             return 1
 
-        self.G = nx.gnp_random_graph(numNodes, 1, directed=True) # Create fully connected directed Erdos-Renyi graph.
+        self.G = nx.gnp_random_graph(self.numNodes, 1, directed=True) # Create fully connected directed Erdos-Renyi graph.
         self.G = nx.DiGraph([(u,v) for (u,v) in self.G.edges() if u<v], horizon = T, id = graphid) # Drop all edges (u,v) where edge u<v to enforce acyclic graph property.
-        rootNodes = random.sample(range(1,numNodes-1),numRoot-1) # Given the parameter numRoot, pick numRoot-1 random root IDs.
-                                                                 # Node 0 will also always be root. Last node (ID:numNodes) cannot be root node.
+        rootNodes = random.sample(range(1,self.numNodes-1),self.numRoot-1) # Given the parameter self.numRoot, pick self.numRoot-1 random root IDs.
+                                                                 # Node 0 will also always be root. Last node (ID:self.numNodes) cannot be root node.
+        goalNodes = random.sample(list(set(range(1,self.numNodes))-set(rootNodes)),self.numGoals) # Randomly pick GoalNodes
+
         for rootNode in rootNodes: # Out of the picked rootNodes, drop all edges (u,v) where v = rootNode.
             for start in range(0, rootNode):
                 self.G.remove_edge(start, rootNode)
         canRemove = list(self.G.edges)
-        while len(self.G.edges) > numEdges and len(canRemove) != 0: # Randomly delete edges until numEdges is met, or if there are no more nodes to remove.
+        while len(self.G.edges) > self.numEdges and len(canRemove) != 0: # Randomly delete edges until self.numEdges is met, or if there are no more nodes to remove.
                                                                     # canRemove = nodes not yet removed OR nodes that once removed do not
                                                                     # break the connected property.
             deleteEdge = random.choice(canRemove)
@@ -67,13 +74,16 @@ class Environment(object):
             canRemove.remove(deleteEdge)
 
         # Set random node attributes
-        for nodeID in range(numNodes):
+        for nodeID in range(self.numNodes):
             if len(self.G.pred[nodeID]) == 0:
                 self.setRoot_N(nodeID, 1)
                 self.setType_N(nodeID, 0) # Root nodes cannot be target (goal) nodes.
             else:
                 self.setRoot_N(nodeID, 0)
-                self.setType_N(nodeID, np.random.randint(2))
+                if nodeID in goalNodes: # Set Goal nodes
+                	self.setType_N(nodeID, 1)
+                else:
+                	self.setType_N(nodeID, 0)
             self.setActivationType_N(nodeID, np.random.randint(2))
             self.setState_N(nodeID, np.random.randint(2))
             self.setAReward_N(nodeID, np.random.uniform(0, NmaxAReward))
@@ -92,34 +102,32 @@ class Environment(object):
             self.setweight_E(edge, np.random.uniform(EminWeight, EmaxWeight))
             self.setActProb_E(edge, np.random.uniform(0, 1))
 
-        return self.G
-
        # Parameter Format:
-       #    Nodes = List of N integers, representing Node IDs.
+       #    AttributesDict: Dictionary of the following attributes:
+       #	Nodes = List of N integers, representing Node IDs.
        #    Edges = List of E Tuples, representing Edges.
        #    Nroots, Ntypes, NeTypes, Nstates, NaRewards, NdPenalties, NdCosts, NaCosts, NposActiveProbs, NposInacriveProbs, NtopoPositions: 
        #    Size N list. Each List[x] attribute correspondes to the node in position nodes[x].
-    def specifiedDAG(self, nodes, edges, Nroots, Ntypes, NeTypes, Nstates, NaRewards, NdPenalties, NdCosts, NaCosts, NposActiveProbs, NposInactiveProbs, NtopoPositions, Eeids, Etypes, Ecosts, Eweights, EactProbs, T, graphid):
+    def specifiedDAG(self, attributesDict):
         self.daggenerator_wo_attrs(nodes,edges,T,graphid)
-        for nodeID in range(nodes):
-            self.setRoot_N(nodeID, Nroots[nodeID])
-            self.setType_N(nodeID, Ntypes[nodeID])
-            self.setActivationType_N(nodeID, NeTypes[nodeID])
-            self.setState_N(nodeID, Nstates[nodeID]) # Are all nodes inactive at the start? Or not?
-            self.setAReward_N(nodeID, NaRewards[nodeID])
-            self.setDPenalty_N(nodeID, NdPenalties[nodeID])
-            self.setDCost_N(nodeID, NdCosts[nodeID])
-            self.setACost_N(nodeID, NaCosts[nodeID])
-            self.setposActiveProb_N(nodeID, NposActiveProbs[nodeID])
-            self.setposInactiveProb_N(nodeID, NposInactiveProbs[nodeID])
-            self.setTopoPosition_N(nodeID, NtopoPositions[nodeID])
-        for edge in range(edges):
-            self.setid_E((edges[0], edges[1]), Eeids[edge])
-            self.setType_E((edges[0], edges[1]), Etypes[edge])
-            self.setACost_E((edges[0], edges[1]), Ecosts[edge])
-            self.setweight_E((edges[0], edges[1]), Eweights[edge])
-            self.setActProb_E((edges[0], edges[1]), actProb[edge])
-        return self.G
+        for nodeID in range(attributesDict[nodes]):
+            self.setRoot_N(nodeID, attributesDict[Nroots[nodeID]])
+            self.setType_N(nodeID, attributesDict[Ntypes[nodeID]])
+            self.setActivationType_N(nodeID, attributesDict[NeTypes[nodeID]])
+            self.setState_N(nodeID, attributesDict[Nstates[nodeID]]) # Are all nodes inactive at the start? Or not?
+            self.setAReward_N(nodeID, attributesDict[NaRewards[nodeID]])
+            self.setDPenalty_N(nodeID, attributesDict[NdPenalties[nodeID]])
+            self.setDCost_N(nodeID, attributesDict[NdCosts[nodeID]])
+            self.setACost_N(nodeID, attributesDict[NaCosts[nodeID]])
+            self.setposActiveProb_N(nodeID, attributesDict[NposActiveProbs[nodeID]])
+            self.setposInactiveProb_N(nodeID, attributesDict[NposInactiveProbs[nodeID]])
+            self.setTopoPosition_N(nodeID, attributesDict[NtopoPositions[nodeID]])
+        for edge in range(attributesDict[edges]):
+            self.setid_E((attributesDict[edges[0]], attributesDict[edges[1]]), attributesDict[Eeids[edge]])
+            self.setType_E((attributesDict[edges[0]], attributesDict[edges[1]]), attributesDict[Etypes[edge]])
+            self.setACost_E((attributesDict[edges[0]], attributesDict[edges[1]]), attributesDict[Ecosts[edge]])
+            self.setweight_E((attributesDict[edges[0]], attributesDict[edges[1]]), attributesDict[Eweights[edge]])
+            self.setActProb_E((attributesDict[edges[0]], attributesDict[edges[1]]), attributesDict[actProb[edge]])
 
     # Visualizes DAG
     # Node did not visualize: aReward, dPenalty, dCost, aCost, posActiveProb, posInactiveProb, actProb, topoPosition
@@ -541,6 +549,6 @@ class Environment(object):
 
 """
 test = Environment()
-test.randomDAG(20, 30, 2, 1, 1, 1)
+test.randomDAG(1,1)
 test.visualize()
 """
