@@ -560,7 +560,7 @@ class Environment(object):
         num_oredges, _ = self.get_ORedges()
         return num_andnode + num_oredges + 1 #pass
 
-    def act_dim_att(self):
+    def act_dim_def(self):
         return self.G.number_of_nodes() + 1 #pass
 
 
