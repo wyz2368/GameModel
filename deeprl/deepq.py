@@ -139,7 +139,7 @@ def learn_att(env,
         gamma=gamma,
         grad_norm_clipping=10,
         #add a mask function for the choice of actions
-        mask_func=
+        mask_func =
     )
 
     act_params = {
@@ -209,7 +209,7 @@ def learn_att(env,
                 kwargs['reset'] = reset
                 kwargs['update_param_noise_threshold'] = update_param_noise_threshold
                 kwargs['update_param_noise_scale'] = True
-            action = act(np.array(obs)[None], update_eps=update_eps, **kwargs)[0]
+            action = act(np.array(obs)[None], update_eps=update_eps, **kwargs)[0] #__call()__
             env_action = action
             reset = False
             new_obs, rew, done, _ = env.step(env_action)

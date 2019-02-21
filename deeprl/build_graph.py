@@ -86,7 +86,7 @@ def build_train_att(make_obs_ph, q_func, num_actions, optimizer, mask_func, grad
         q_t_selected = tf.reduce_sum(q_t * tf.one_hot(act_t_ph, num_actions), 1)
 
         # compute estimate of best possible value starting from state at t + 1
-        # Did not modify double_q
+        # Did not modify double_q for masking illegal actions.
         if double_q:
             q_tp1_using_online_net = q_func(obs_tp1_input.get(), num_actions, scope="q_func", reuse=True)
             q_tp1_best_using_online_net = tf.argmax(q_tp1_using_online_net, 1)

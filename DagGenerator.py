@@ -6,10 +6,13 @@ import matplotlib.pyplot as plt
 
 class Environment(object):
 
-    def __init__(self, num_attr_N=12, num_attr_E=5, T=10, graphid=1, numNodes=20, numEdges=10, numRoot=3, numGoals=3):
+    def __init__(self, num_attr_N = 11, num_attr_E = 4, T=10, graphid=1, numNodes=20, numEdges=10, numRoot=3, numGoals=3, history = 3):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
+        self.T = T
+        self.graphid = graphid
         self.G = nx.DiGraph(horizon = T, id = graphid)
+        self.history = history
 
         # randomDAG parameters
         self.numNodes = numNodes
@@ -17,7 +20,7 @@ class Environment(object):
         self.numRoot = numRoot
         self.numGoals = numGoals
 
-    def daggenerator_wo_attrs(self,nodeset,edgeset,T,graphid):
+    def daggenerator_wo_attrs(self,nodeset,edgeset):
         self.G.add_nodes_from(nodeset,
                          root = 0, # 0:NONROOT 1:ROOTNODE
                          type = 0, # 0:NONTARGET 1:TARGET
@@ -28,24 +31,22 @@ class Environment(object):
                          dCost = 0.0, # SAME^
                          aCost = 0.0, # SAME^
                          posActiveProb = 1.0, # prob of sending positive signal if node is active
-                         posInactiveProb = 0.0, # prob of sending positive signal if node is inactive
-                         actProb = 1.0, # prob of becoming active if being activated, for AND node only
-                         topoPosition = -1)
+                         posInactiveProb = 0.0, # prob of sending positive signal if node is inactive(false alarm)
+                         actProb = 1.0) # prob of becoming active if being activated, for AND node only
         self.G.add_edges_from(edgeset,
                          eid = -1,
                          type = 0, # 0:NORMAL 1:VIRTUAL
                          cost = 0, # Cost for attacker on OR node, GREATER THAN OR EQUAL TO 0
-                         weight = 0.0,
                          actProb=1.0) # probability of successfully activating, for OR node only
 
-    def randomDAG(self, T, graphid, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100, EminWeight=0, EmaxWeight=100):
+    def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100, EminWeight=0, EmaxWeight=100):
         # Exception handling
-        try:
-            if self.numRoot + self.numGoals > self.numNodes:
-                raise Exception("(Number of root nodes) + (Number of goal nodes) cannot exceed total number of nodes.")
-        except Exception as error:
-            print(repr(error))
-            return 1
+        # try:
+        #     if self.numRoot + self.numGoals > self.numNodes:
+        #         raise Exception("(Number of root nodes) + (Number of goal nodes) cannot exceed total number of nodes.")
+        # except Exception as error:
+        #     print(repr(error))
+        #     return 1
         try:
             maxEdges = (self.numNodes-1)*(self.numNodes)/2
             if self.numEdges > maxEdges:
@@ -55,7 +56,7 @@ class Environment(object):
             return 1
 
         self.G = nx.gnp_random_graph(self.numNodes, 1, directed=True) # Create fully connected directed Erdos-Renyi graph.
-        self.G = nx.DiGraph([(u,v) for (u,v) in self.G.edges() if u<v], horizon = T, id = graphid) # Drop all edges (u,v) where edge u<v to enforce acyclic graph property.
+        self.G = nx.DiGraph([(u,v) for (u,v) in self.G.edges() if u<v], horizon = self.T, id = self.graphid) # Drop all edges (u,v) where edge u<v to enforce acyclic graph property.
         rootNodes = random.sample(range(1,self.numNodes-1),self.numRoot-1) # Given the parameter self.numRoot, pick self.numRoot-1 random root IDs.
                                                                  # Node 0 will also always be root. Last node (ID:self.numNodes) cannot be root node.
         goalNodes = random.sample(list(set(range(1,self.numNodes))-set(rootNodes)),self.numGoals) # Randomly pick GoalNodes
@@ -81,9 +82,9 @@ class Environment(object):
             else:
                 self.setRoot_N(nodeID, 0)
                 if nodeID in goalNodes: # Set Goal nodes
-                	self.setType_N(nodeID, 1)
+                    self.setType_N(nodeID, 1)
                 else:
-                	self.setType_N(nodeID, 0)
+                    self.setType_N(nodeID, 0)
             self.setActivationType_N(nodeID, np.random.randint(2))
             self.setState_N(nodeID, np.random.randint(2))
             self.setAReward_N(nodeID, np.random.uniform(0, NmaxAReward))
@@ -193,6 +194,7 @@ class Environment(object):
         return self.G.graph['horizon']
 
     def setHorizon_G(self,value):
+        self.T = value
         self.G.graph['horizon'] = value
 
     # Node Operations
@@ -223,9 +225,6 @@ class Environment(object):
 
     def getActProb_N(self,id):
         return self.G.nodes[id]['actProb']
-
-    def getTopoPosition_N(self,id):
-        return self.G.nodes[id]['topoPosition']
 
     def getposActiveProb_N(self,id):
         return self.G.nodes[id]['posActiveProb']
@@ -282,8 +281,8 @@ class Environment(object):
 
     def setDPenalty_N(self,id,value):
         try:
-            if value < 0:
-                raise Exception("Node dPenalty must be greater than or equal to 0.")
+            if value > 0:
+                raise Exception("Node dPenalty must be less than or equal to 0.")
             else:
                 self.G.nodes[id]['dPenalty'] = value
         except Exception as error:
@@ -291,8 +290,8 @@ class Environment(object):
 
     def setDCost_N(self,id,value):
         try:
-            if value < 0:
-                raise Exception("Node dCost must be greater than or equal to 0.")
+            if value > 0:
+                raise Exception("Node dCost must be less than or equal to 0.")
             else:
                 self.G.nodes[id]['dCost'] = value
         except Exception as error:
@@ -300,8 +299,8 @@ class Environment(object):
 
     def setACost_N(self,id,value):
         try:
-            if value < 0:
-                raise Exception("Node aCost must be greater than or equal to 0.")
+            if value > 0:
+                raise Exception("Node aCost must be less than or equal to 0.")
             else:
                 self.G.nodes[id]['aCost'] = value
         except Exception as error:
@@ -315,10 +314,6 @@ class Environment(object):
                 self.G.nodes[id]['actProb'] = value
         except Exception as error:
             print(repr(error))
-
-    def setTopoPosition_N(self,id,value):
-        ### ERROR CHECKING FOR LATER
-        self.G.nodes[id]['topoPosition'] = value
 
     def setposActiveProb_N(self,id,value):
         try:
@@ -352,8 +347,6 @@ class Environment(object):
     def getActProb_E(self,edge):
         return self.G.edges[edge]['actProb']
 
-    def getweight_E(self,edge):
-        return self.G.edges[edge]['weight']
 
     # Set Info
 
@@ -387,9 +380,6 @@ class Environment(object):
         except Exception as error:
             print(repr(error))
 
-    def setweight_E(self,edge,value):
-         self.G.edges[edge]['weight'] = value
-
     # Print Info
     def print_N(self,id):
         print(self.G.nodes[id])
@@ -414,7 +404,7 @@ class Environment(object):
         return set(self.G.predecessors(id))
 
     def successors(self,id):
-        return set(self.G.sucessors(id))
+        return set(self.G.successors(id))
 
     def isDAG(self):
         return nx.is_directed_acyclic_graph(self.G)
@@ -425,7 +415,7 @@ class Environment(object):
     def get_ANDnodes(self):
         count = 0
         Andset = set()
-        for node in G.nodes:
+        for node in self.G.nodes:
             if self.G.nodes[node]['eType'] == 1:
                 count += 1
                 Andset.add(node)
@@ -434,19 +424,19 @@ class Environment(object):
     def get_ORnodes(self):
         count = 0
         Orset = set()
-        for node in G.nodes:
+        for node in self.G.nodes:
             if self.G.nodes[node]['eType'] == 0:
                 count += 1
                 Orset.add(node)
         return count, Orset
 
     def get_ORedges(self):
-        ornodes = get_ORnodes(self.G)
+        ornodes = self.get_ORnodes()
         oredges = []
         for node in ornodes:
             oredges.append(self.G.in_edges(node))
-        oredges = sortEdge(oredges)
-        return oredges
+        oredges = self.sortEdge(oredges)
+        return len(oredges), oredges
 
     def get_Targets(self):
         count = 0
@@ -466,19 +456,21 @@ class Environment(object):
                 rootset.add(node)
         return count,rootset
 
-    def get_num_NormalEdges(self):
+    def get_NormalEdges(self):
         count = 0
+        normaledge = set()
         for edge in self.G.edges:
             if self.G.edges[edge]['type'] == 0:
                 count += 1
-        return count
+                normaledge.add(edge)
+        return count, self.sortEdge(normaledge)
 
     # Attributes Initialization
     def assignAttr_N(self,id,attr): #add code to check the lenth match
-        self.G.nodes[id].update(dict(zip(G.nodes[id].keys(),attr)))
+        self.G.nodes[id].update(dict(zip(self.G.nodes[id].keys(),attr)))
 
     def assignAttr_E(self,edge,attr):
-        self.G.edges[edge].update(dict(zip(G.edges[edge].keys(),attr)))
+        self.G.edges[edge].update(dict(zip(self.G.edges[edge].keys(),attr)))
 
     #def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 5,num_targets = 1,num_root = 1):
     # Hard coding
@@ -486,11 +478,12 @@ class Environment(object):
 
     ### API FUNCTIONS ###
 
-    def step(self,attact,defact):
+    # attact and defact are attack set and defence set
+    def _step(self,attact,defact):
         # immediate reward for both players
         aReward = 0
         dReward = 0
-        T = self.G.graph['horizon']
+        # T = self.G.graph['horizon'] # if discounted, should count how many times _step is called.
         #attacker's action
         for attack in attact:
             if isinstance(attack,tuple):
@@ -516,6 +509,7 @@ class Environment(object):
         # return true state and obs
         return self.get_att_isActive(),self.get_def_hadAlert(),aReward,dReward
 
+    #return a list of indicator of whether node is activated.
     def get_att_isActive(self):
         isActive = []
         for id in np.arange(self.getNumNodes()):
@@ -525,15 +519,16 @@ class Environment(object):
                 isActive.append(0)
         return isActive
 
+    # can be called only once for each time step.
     def get_def_hadAlert(self):
         alert = []
         for node in self.G.nodes:
-            if self.G.nodesp[node]['state'] == 1:
+            if self.G.nodes[node]['state'] == 1:
                 if random.uniform(0, 1) <= self.G.nodes[node]['posActiveProb']:
                     alert.append(1)
                 else:
                     alert.append(0)
-            elif self.G.nodesp[node]['state'] == 0:
+            elif self.G.nodes[node]['state'] == 0:
                 if random.uniform(0, 1) <= self.G.nodes[node]['posInactiveProb']:
                     alert.append(1)
                 else:
@@ -543,9 +538,32 @@ class Environment(object):
         return alert
 
     #reset the environment, G_reserved is a copy of the initial env
-    def reset(self,G_reserved):
-        self.G = G_reserved.copy()
-        return self.G
+    def save_graph_copy(self):
+        self.G_reserved = self.G.copy()
+
+
+    def reset(self):
+        self.G = self.G_reserved.copy()
+
+    #other APIs similar to OpenAI gym
+    def obs_dim_att(self):
+        num_andnode, _ = self.get_ANDnodes()
+        num_oredges, _ = self.get_ORedges()
+        return self.G.number_of_nodes() + 2*(num_andnode + num_oredges) + 1
+
+    def obs_dim_def(self):
+        N = self.G.number_of_nodes()
+        return self.history*N*2 + N + 1 # NO CNN
+
+    def act_dim_att(self):
+        num_andnode, _ = self.get_ANDnodes()
+        num_oredges, _ = self.get_ORedges()
+        return num_andnode + num_oredges + 1 #pass
+
+    def act_dim_att(self):
+        return self.G.number_of_nodes() + 1 #pass
+
+
 
 """
 test = Environment()
