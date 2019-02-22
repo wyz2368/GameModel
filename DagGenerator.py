@@ -13,12 +13,17 @@ class Environment(object):
         self.graphid = graphid
         self.G = nx.DiGraph(horizon = T, id = graphid)
         self.history = history
+        self.training_flag = -1 # =0 defender is training and =1 attacker is training and =2 both are training
 
         # randomDAG parameters
         self.numNodes = numNodes
         self.numEdges = numEdges
         self.numRoot = numRoot
         self.numGoals = numGoals
+
+        # defender's and attacker's action space
+        self.actionspace_att = self.get_att_actionspace()
+        self.actionspace_def = self.get_def_actionspace()
 
     def daggenerator_wo_attrs(self,nodeset,edgeset):
         self.G.add_nodes_from(nodeset,
@@ -537,6 +542,63 @@ class Environment(object):
                 raise ValueError("node state is abnormal.")
         return alert
 
+    def get_att_actionspace(self):
+        num_andnode, _ = self.get_ANDnodes()
+        _, oregdes = self.get_ORedges()
+        actionspace = [i+1 for i in range(num_andnode)] + oregdes + ['pass']
+        return actionspace
+
+    def get_def_actionspace(self):
+        actionspace = [i+1 for i in range(self.numNodes)] + ['pass']
+        return actionspace
+
+    # step function while action set building
+    # action is a number index for the real action
+    def _step_att(self, action, def_act_set):
+        immediateReward = 0
+        index = action - 1
+        action_picked = self.actionspace_att[index]
+        if isinstance(action_picked,tuple):
+            if random.uniform(0,1) <= self.G.edges[action_picked]['actProb']:
+                self.G.nodes[action_picked[-1]]['state'] = 1
+        elif isinstance(action_picked,int):
+            #check AND node
+            if random.uniform(0,1) <= self.G.nodes[action_picked]['actProb']:
+                self.G.nodes[action_picked]['state'] = 1
+        else:
+            raise ValueError("Unacceptable action!")
+
+        for node in def_act_set:
+            self.G.nodes[node]['state'] = 0
+
+        #TODO: return obs, reward => DQN
+
+    def _step_def(self, action):
+        immediateReward = 0
+        self.G.nodes[action]['state'] = 0
+
+        # TODO: return obs, reward => DQN
+
+    # Environment step function
+    def step(self, action, defender, attacker, training_flag):
+        #TODO: does not finished.
+        index = action - 1
+        if training_flag == 0: #defender is training
+            if self.actionspace_def[index] == 'pass':
+                self._step()
+            else:
+                self._step_def(action)
+        else:
+            if self.actionspace_att[index] == 'pass':
+                self._step()
+            else:
+                self._step_att(action,attacker.#TODO)
+
+
+
+
+
+
     #reset the environment, G_reserved is a copy of the initial env
     def save_graph_copy(self):
         self.G_reserved = self.G.copy()
@@ -562,6 +624,11 @@ class Environment(object):
 
     def act_dim_def(self):
         return self.G.number_of_nodes() + 1 #pass
+
+    def set_training_flag(self, flag):
+        self.training_flag = flag
+        # This flag is just a copy of who is training now. Each player inputs another flag to step function while training
+
 
 
 

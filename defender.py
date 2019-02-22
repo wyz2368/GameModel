@@ -1,17 +1,14 @@
 import random
-import DagGenerator as dag
 
 class Defender(object):
-    num_resource = 4
-    observation = []
-    prev_obs = []
-    defact = set()
-    defact_tm1 = set()
-    timeleft = 10
 
-    def __init__(self,resource,timeleft):
-        self.num_resource = resource
-        self.timeleft = timeleft
+    def __init__(self):
+        self.rand_limit = 4
+        self.observation = []
+        self.prev_obs = []
+        self.defact = set()
+        self.defact_tm1 = set()
+        self.prev_defact = []
 
     def def_greedy_action_builder(self, G, nn_def):
         self.defact.clear()
@@ -25,14 +22,15 @@ class Defender(object):
                 self.defact.add(x)
         return self.defact
 
-    def def_obs_constructor(self, G):
+    def def_obs_constructor(self, G, timeleft):
         wasdef = self.get_def_wasDefended(G)
         indef = self.get_def_inDefenseSet(G)
         # no need for repeating timeleft, so it is not N
-        def_input = self.prev_obs + self.observation + wasdef + indef + [self.timeleft]
+        def_input = self.prev_obs + self.observation + wasdef + indef + [timeleft]
         return def_input
 
     def get_def_wasDefended(self, G):
+        # TODO: if nothing in the defact_tm1, put 0
         wasdef = []
         for node in G.nodes:
             if node in self.defact_tm1:
@@ -50,5 +48,5 @@ class Defender(object):
                 indef.append(0)
         return indef
 
-    def uniform_strategy(self,G):
-        return random.choices(list(G.nodes),k=self.num_resource)
+    def uniform_strategy(self, G):
+        return random.choices(list(G.nodes),k = self.rand_limit)
