@@ -10,6 +10,7 @@ class Environment(object):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
         self.T = T
+        self.current_time_step = 1
         self.graphid = graphid
         self.G = nx.DiGraph(horizon = T, id = graphid)
         self.history = history

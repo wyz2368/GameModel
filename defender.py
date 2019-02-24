@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 class Defender(object):
 
@@ -7,37 +8,54 @@ class Defender(object):
         self.observation = []
         self.prev_obs = []
         self.defact = set()
-        self.defact_tm1 = set()
         self.prev_defact = []
+        self.history = 2
 
-    def def_greedy_action_builder(self, G, nn_def):
+    def def_greedy_action_builder(self, G, timeleft,nn_def):
         self.defact.clear()
-        isDup = 0
-        x = 0
+        isDup = False
         while not isDup:
-            def_input = self.def_obs_constructor(G)
-            x = nn_def(def_input)
-            isDup = (x in self.defact)
-            if not isDup and x != -1:
-                self.defact.add(x)
-        return self.defact
+            def_input = self.def_obs_constructor(G, timeleft)
+            x = nn_def(def_input[None])[0] #corrensponding to baselines
+            action_space = self.get_def_actionspace(G)
+            action = action_space[x]
+            isDup = (action in self.defact)
+            if not isDup and action != 'pass':
+                self.defact.add(action)
 
     def def_obs_constructor(self, G, timeleft):
         wasdef = self.get_def_wasDefended(G)
         indef = self.get_def_inDefenseSet(G)
         # no need for repeating timeleft, so it is not N
+        history_length = len(self.prev_obs)
+        if history_length == 0:
+            self.prev_obs = self.prev_obs + [0]*G.number_of_nodes*self.history
+        if history_length == 1:
+            self.prev_obs = [0]*G.number_of_nodes + self.prev_obs
         def_input = self.prev_obs + self.observation + wasdef + indef + [timeleft]
-        return def_input
+        return np.array(def_input)
 
     def get_def_wasDefended(self, G):
-        # TODO: if nothing in the defact_tm1, put 0
         wasdef = []
-        for node in G.nodes:
-            if node in self.defact_tm1:
-                wasdef.append(1)
-            else:
-                wasdef.append(0)
-        return wasdef
+        history_length = len(self.prev_defact)
+        if history_length == 0: #hard coding for history = 2
+            return [0]*G.number_of_nodes*self.history
+        elif history_length == 1:
+            for obs in self.prev_defact:
+                for node in G.nodes:
+                    if node in obs:
+                        wasdef.append(1)
+                    else:
+                        wasdef.append(0)
+            return wasdef+[0]*G.number_of_nodes
+        else:
+            for obs in self.prev_defact:
+                for node in G.nodes:
+                    if node in obs:
+                        wasdef.append(1)
+                    else:
+                        wasdef.append(0)
+            return wasdef
 
     def get_def_inDefenseSet(self, G):
         indef = []
@@ -48,5 +66,31 @@ class Defender(object):
                 indef.append(0)
         return indef
 
+    def get_def_actionspace(self, G):
+        num_nodes = G.number_of_nodes()
+        actionspace = [i+1 for i in range(num_nodes)] + ['pass']
+        return actionspace
+
     def uniform_strategy(self, G):
-        return random.choices(list(G.nodes),k = self.rand_limit)
+        return random.choices(list(G.nodes), k = self.rand_limit)
+
+    def cut_prev_obs(self):
+        if len(self.prev_obs) > self.history:
+            self.prev_obs = self.prev_obs[1:]
+
+    def cut_prev_defact(self):
+        if len(self.prev_defact) > self.history:
+            self.prev_defact = self.prev_defact[1:]
+
+    def update_defact(self, defact):
+        self.prev_defact.append(self.defact)
+        self.defact = set(defact)
+
+    def update_obs(self, obs):
+        self.prev_obs.append(self.observation)
+        self.observation = obs
+
+    def update_history(self, history):
+        self.history = history
+        raise ValueError("Modify hard coding: get_def_wasDefended")
+
