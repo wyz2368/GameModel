@@ -11,7 +11,7 @@ class Defender(object):
         self.prev_defact = []
         self.history = 2
 
-    def def_greedy_action_builder(self, G, timeleft,nn_def):
+    def def_greedy_action_builder(self, G, timeleft, nn_def):
         self.defact.clear()
         isDup = False
         while not isDup:
@@ -19,8 +19,10 @@ class Defender(object):
             x = nn_def(def_input[None])[0] #corrensponding to baselines
             action_space = self.get_def_actionspace(G)
             action = action_space[x]
+            if action == 'pass':
+                break
             isDup = (action in self.defact)
-            if not isDup and action != 'pass':
+            if not isDup:
                 self.defact.add(action)
 
     def def_obs_constructor(self, G, timeleft):
@@ -89,6 +91,7 @@ class Defender(object):
     def update_obs(self, obs):
         self.prev_obs.append(self.observation)
         self.observation = obs
+    # TODO: in env, feed noisy obs to the observation
 
     def update_history(self, history):
         self.history = history

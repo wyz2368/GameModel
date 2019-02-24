@@ -1,45 +1,28 @@
 import random
-import DagGenerator as dag
 
 class Attacker(object):
-    num_resource = 10
-    max_num_attack = 10
-    min_num_attack = 2
-    observation = []
-    att_candidate_set = set()
-    attact = set()
-    timeleft = 10
 
-    def __init__(self,resource,timeleft):
-        self.num_resource = resource
-        self.timeleft = timeleft
+    def __init__(self, oredges, andnodes, actionspace):
+        self.observation = []
+        self.att_candidate_set = set()
+        self.attact = set()
+        self.ORedges = oredges
+        self.ANDnodes = andnodes
+        self.actionspace = actionspace
+        self.rand_limit = 4
 
-    def att_greedy_action_builder(self,G, nn_att):
+    def att_greedy_action_builder(self,G, timeleft, nn_att):
         self.attact.clear()
-        isDup = 0
-        #no pass
-        while not isDup and self.check_num_attack(self.attact):
-            att_input = self.att_obs_constructor(G, self.observation)
-            x = nn_att(att_input)
-            isDup = (x in self.attact)
-            # if isinstance(x, tuple):
-            #     isLegal = (x == -1 or x[0] in att_candidate_set)
-            # else:
-            #     isLegal = (x == -1 or dag.predecessors(G, x) in att_candidate_set)
+        isDup = False
+        while not isDup:
+            att_input = self.att_obs_constructor(G, self.observation, timeleft)
+            x = nn_att(att_input[None])[0] #corrensponding to baselines
+            action = self.actionspace[x]
+            if action == 'pass':
+                break
+            isDup = (action in self.attact)
             if not isDup:
                 self.attact.add(x)
-
-    def check_num_attack(self,attact):
-        len_attact = len(attact)
-        if len_attact <= self.max_num_attack and len_attact >= self.min_num_attack and len_attact <= self.num_resource:
-            return True
-        else:
-            return False
-
-    def update_obs(self,G):
-        self.observation = []
-        for node in G.nodes:
-            self.observation.append(G.nodes[node]['state'])
 
     #construct the input of the neural network
     def att_obs_constructor(self, G, obs):
@@ -111,3 +94,6 @@ class Attacker(object):
         attSet = ANDnodes + ORedges
         actset_masked = list(x for x, z in zip(attSet, actmask) if z)
         return random.choices(actset_masked,k=self.num_resource)
+
+    def update_obs(self, obs):
+        self.observation = obs
