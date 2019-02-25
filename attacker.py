@@ -5,7 +5,6 @@ class Attacker(object):
 
     def __init__(self, oredges, andnodes, actionspace):
         self.observation = []
-        self.att_candidate_set = set()
         self.attact = set()
         self.ORedges = oredges
         self.ANDnodes = andnodes
@@ -31,7 +30,8 @@ class Attacker(object):
         att_input = self.observation + canAttack + inAttackSet + [timeleft]
         return np.array(att_input)
 
-    def get_att_canAttack(self, G): #This function can also be used as masking illegal actions.
+    # This function can also be used as masking illegal actions.
+    def get_att_canAttack(self, G):
         canAttack = []
         for andnode in self.ANDnodes:
             precondflag = 1
@@ -92,4 +92,8 @@ class Attacker(object):
 
     def update_obs(self, obs):
         self.observation = obs
+
+    def reset_att(self):
+        self.observation = []
+        self.attact = set()
 

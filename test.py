@@ -6,5 +6,7 @@ a = np.append(a,1)
 a = np.append(a,15)
 a = np.append(a,16)
 
-print(np.mean(a))
+
+print(a)
+print(a[-2:])
 

@@ -9,10 +9,14 @@ def simulation(env, attacker, nn_att, defender, nn_def, num_episodes):
         aReward = 0
         dReward = 0
         env.G.reset()
+        attacker.reset_att()
+        defender.reset_def()
         for t in range(env.T):
             timeleft = env.T - t
-            att_action_set = attacker.att_greedy_action_builder(env.G, timeleft, nn_att)
-            def_action_set = defender.def_greedy_action_builder(env.G, timeleft, nn_def)
+            attacker.att_greedy_action_builder(env.G, timeleft, nn_att)
+            att_action_set = attacker.attact
+            defender.def_greedy_action_builder(env.G, timeleft, nn_def)
+            def_action_set = defender.defact
             for attack in att_action_set:
                 if isinstance(attack, tuple):
                     # check OR node

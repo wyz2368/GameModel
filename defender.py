@@ -4,12 +4,14 @@ import numpy as np
 class Defender(object):
 
     def __init__(self):
-        self.rand_limit = 4
         self.observation = []
         self.prev_obs = []
+
         self.defact = set()
         self.prev_defact = []
+
         self.history = 2
+        self.rand_limit = 4
 
     def def_greedy_action_builder(self, G, timeleft, nn_def):
         self.defact.clear()
@@ -17,6 +19,8 @@ class Defender(object):
         while not isDup:
             def_input = self.def_obs_constructor(G, timeleft)
             x = nn_def(def_input[None])[0] #corrensponding to baselines
+            if not isinstance(x,int):
+                raise ValueError("The chosen action is not an integer.")
             action_space = self.get_def_actionspace(G)
             action = action_space[x]
             if action == 'pass':
@@ -49,7 +53,7 @@ class Defender(object):
                         wasdef.append(1)
                     else:
                         wasdef.append(0)
-            return wasdef+[0]*G.number_of_nodes
+            return [0]*G.number_of_nodes + wasdef
         else:
             for obs in self.prev_defact:
                 for node in G.nodes:
@@ -74,19 +78,18 @@ class Defender(object):
         return actionspace
 
     def uniform_strategy(self, G):
-        return random.choices(list(G.nodes), k = self.rand_limit)
+        return set(random.choices(list(G.nodes), k = self.rand_limit))
 
     def cut_prev_obs(self):
         if len(self.prev_obs) > self.history:
-            self.prev_obs = self.prev_obs[1:]
+            self.prev_obs = self.prev_obs[-self.history:]
 
     def cut_prev_defact(self):
         if len(self.prev_defact) > self.history:
-            self.prev_defact = self.prev_defact[1:]
+            self.prev_defact = self.prev_defact[-self.history:]
 
-    def update_defact(self, defact):
+    def save_defact2prev(self):
         self.prev_defact.append(self.defact)
-        self.defact = set(defact)
 
     def update_obs(self, obs):
         self.prev_obs.append(self.observation)
@@ -96,4 +99,11 @@ class Defender(object):
     def update_history(self, history):
         self.history = history
         raise ValueError("Modify hard coding: get_def_wasDefended")
+
+
+    def reset_def(self):
+        self.observation = []
+        self.prev_obs = []
+        self.defact = set()
+        self.prev_defact = []
 
