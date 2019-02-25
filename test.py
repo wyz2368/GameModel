@@ -1,4 +1,10 @@
 import numpy as np
 
-a = [(1,2,3),(4,5,6),(7,8,9)]
-print(a+[0]*5)
+a = np.array([])
+a = np.append(a,12)
+a = np.append(a,1)
+a = np.append(a,15)
+a = np.append(a,16)
+
+print(np.mean(a))
+

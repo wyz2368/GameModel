@@ -16,7 +16,7 @@ class Attacker(object):
         self.attact.clear()
         isDup = False
         while not isDup:
-            att_input = self.att_obs_constructor(G, self.observation, timeleft)
+            att_input = self.att_obs_constructor(G, timeleft)
             x = nn_att(att_input[None])[0] #corrensponding to baselines
             action = self.actionspace[x]
             if action == 'pass':
