@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 class Attacker(object):
 
@@ -11,7 +12,7 @@ class Attacker(object):
         self.actionspace = actionspace
         self.rand_limit = 4
 
-    def att_greedy_action_builder(self,G, timeleft, nn_att):
+    def att_greedy_action_builder(self, G, timeleft, nn_att):
         self.attact.clear()
         isDup = False
         while not isDup:
@@ -22,20 +23,19 @@ class Attacker(object):
                 break
             isDup = (action in self.attact)
             if not isDup:
-                self.attact.add(x)
+                self.attact.add(action)
 
     #construct the input of the neural network
-    def att_obs_constructor(self, G, obs):
+    def att_obs_constructor(self, G, timeleft):
         canAttack, inAttackSet = self.get_att_canAttack_inAttackSet(G)
-        att_input = obs + canAttack + inAttackSet + [self.timeleft]
-        return att_input
+        att_input = self.observation + canAttack + inAttackSet + [timeleft]
+        return np.array(att_input)
 
-    def get_att_canAttack(self, G):
+    def get_att_canAttack(self, G): #This function can also be used as masking illegal actions.
         canAttack = []
-        _, Andnodeset = dag.get_ANDnodes(G)
-        for andnode in Andnodeset:
+        for andnode in self.ANDnodes:
             precondflag = 1
-            precond = dag.predecessors(G, andnode)
+            precond = G.predecessors(andnode)
             for prenode in precond:
                 if G.nodes[prenode]['state'] == 0:
                     precondflag = 0
@@ -45,8 +45,7 @@ class Attacker(object):
             else:
                 canAttack.append(0)
 
-        oredgeset = dag.get_ORedges(G)
-        for (father, son) in oredgeset:
+        for (father, son) in self.ORedges:
             if G.nodes[father]['state'] == 1 and G.nodes[son]['state'] == 0:
                 canAttack.append(1)
             else:
@@ -57,14 +56,13 @@ class Attacker(object):
     def get_att_canAttack_inAttackSet(self, G):
         canAttack = []
         inAttackSet = []
-        _, Andnodeset = dag.get_ANDnodes(G)
-        for andnode in Andnodeset:
+        for andnode in self.ANDnodes:
             if andnode in self.attact:
                 inAttackSet.append(1)
             else:
                 inAttackSet.append(0)
             precondflag = 1
-            precond = dag.predecessors(G, andnode)
+            precond = G.predecessors(andnode)
             for prenode in precond:
                 if G.nodes[prenode]['state'] == 0:
                     precondflag = 0
@@ -74,8 +72,7 @@ class Attacker(object):
             else:
                 canAttack.append(0)
 
-        oredgeset = dag.get_ORedges(G)
-        for (father, son) in oredgeset:
+        for (father, son) in self.ORedges:
             if (father, son) in self.attact:
                 inAttackSet.append(1)
             else:
@@ -89,11 +86,10 @@ class Attacker(object):
 
     def uniform_strategy(self,G):
         actmask = self.get_att_canAttack(G)
-        ANDnodes = list(dag.get_ANDnodes(G))
-        ORedges = dag.get_ORedges(G)
-        attSet = ANDnodes + ORedges
+        attSet = self.ANDnodes + self.ORedges
         actset_masked = list(x for x, z in zip(attSet, actmask) if z)
-        return random.choices(actset_masked,k=self.num_resource)
+        return random.choices(actset_masked,k = self.rand_limit)
 
     def update_obs(self, obs):
         self.observation = obs
+
