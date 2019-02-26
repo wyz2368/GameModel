@@ -33,7 +33,7 @@ class Environment(object):
                          eType = 0,# 0:OR 1:AND node
                          state = 0,# 0:Inactive 1:Active
                          aReward = 0.0, # GREATER THAN OR EQUAL TO 0
-                         dPenalty = 0.0, # SAME^
+                         dPenalty = 0.0, # LESS THAN OR EQUAL TO 0
                          dCost = 0.0, # SAME^
                          aCost = 0.0, # SAME^
                          posActiveProb = 1.0, # prob of sending positive signal if node is active
@@ -116,7 +116,7 @@ class Environment(object):
        #    Nroots, Ntypes, NeTypes, Nstates, NaRewards, NdPenalties, NdCosts, NaCosts, NposActiveProbs, NposInacriveProbs, NtopoPositions: 
        #    Size N list. Each List[x] attribute correspondes to the node in position nodes[x].
     def specifiedDAG(self, attributesDict):
-        self.daggenerator_wo_attrs(nodes,edges,T,graphid)
+        self.daggenerator_wo_attrs(nodes,edges)
         for nodeID in range(attributesDict[nodes]):
             self.setRoot_N(nodeID, attributesDict[Nroots[nodeID]])
             self.setType_N(nodeID, attributesDict[Ntypes[nodeID]])
