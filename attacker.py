@@ -5,6 +5,7 @@ class Attacker(object):
 
     def __init__(self, oredges, andnodes, actionspace):
         self.observation = []
+        self.canAttack = []
         self.attact = set()
         self.ORedges = oredges
         self.ANDnodes = andnodes
@@ -17,7 +18,7 @@ class Attacker(object):
         while not isDup:
             att_input = self.att_obs_constructor(G, timeleft)
             x = nn_att(att_input[None])[0] #corrensponding to baselines
-            action = self.actionspace[x]
+            action = self.actionspace[x-1]
             if action == 'pass':
                 break
             isDup = (action in self.attact)
@@ -95,5 +96,9 @@ class Attacker(object):
 
     def reset_att(self):
         self.observation = []
-        self.attact = set()
+        self.canAttack = []
+        self.attact.clear()
+
+    def set_canAttack(self,obs):
+        self.canAttack = obs
 

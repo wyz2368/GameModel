@@ -22,7 +22,7 @@ class Defender(object):
             if not isinstance(x,int):
                 raise ValueError("The chosen action is not an integer.")
             action_space = self.get_def_actionspace(G)
-            action = action_space[x]
+            action = action_space[x-1]
             if action == 'pass':
                 break
             isDup = (action in self.defact)
@@ -104,6 +104,6 @@ class Defender(object):
     def reset_def(self):
         self.observation = []
         self.prev_obs = []
-        self.defact = set()
+        self.defact.clear()
         self.prev_defact = []
 

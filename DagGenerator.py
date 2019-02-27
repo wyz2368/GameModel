@@ -3,6 +3,8 @@ import numpy as np
 import sys
 import random
 import matplotlib.pyplot as plt
+import attacker
+import defender
 
 class Environment(object):
 
@@ -10,6 +12,7 @@ class Environment(object):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
         self.T = T
+        self.current_time = 0
         self.current_time_step = 1
         self.graphid = graphid
         self.G = nx.DiGraph(horizon = T, id = graphid)
@@ -25,6 +28,12 @@ class Environment(object):
         # defender's and attacker's action space
         self.actionspace_att = self.get_att_actionspace()
         self.actionspace_def = self.get_def_actionspace()
+
+        #create players
+        self.attacker = attacker.Attacker(oredges=self.get_ORedges(),
+                                          andnodes=self.get_ANDnodes(),
+                                          actionspace=self.get_def_actionspace())
+        self.defender = defender.Defender()
 
     def daggenerator_wo_attrs(self,nodeset,edgeset):
         self.G.add_nodes_from(nodeset,
@@ -484,37 +493,6 @@ class Environment(object):
 
     ### API FUNCTIONS ###
 
-    # attact and defact are attack set and defence set
-    def _step(self,attact,defact):
-        # immediate reward for both players
-        aReward = 0
-        dReward = 0
-        # T = self.G.graph['horizon'] # if discounted, should count how many times _step is called.
-        #attacker's action
-        for attack in attact:
-            if isinstance(attack,tuple):
-                #check OR node
-                aReward += self.G.edges[attack]['cost']
-                if random.uniform(0,1) <= self.G.edges[attack]['actProb']:
-                    self.G.nodes[attack[-1]]['state'] = 1
-            else:
-                #check AND node
-                aReward += self.G.nodes[attack]['aCost']
-                if random.uniform(0,1) <= self.G.nodes[attack]['actProb']:
-                    self.G.nodes[attack]['state'] = 1
-        #defender's action
-        for node in defact:
-            self.G.nodes[node]['state'] = 0
-            dReward += self.G.nodes[node]['dCost']
-        _,targetset = self.get_Targets()
-        for node in targetset:
-            if self.G.nodes[node]['state'] == 1:
-                aReward += self.G.nodes[node]['aReward']
-                dReward += self.G.nodes[node]['dPenalty']
-        #if goal node prevails for next time step
-        # return true state and obs
-        return self.get_att_isActive(),self.get_def_hadAlert(),aReward,dReward
-
     #return a list of indicator of whether node is activated.
     def get_att_isActive(self):
         isActive = []
@@ -554,47 +532,100 @@ class Environment(object):
         return actionspace
 
     # step function while action set building
-    # action is a number index for the real action
-    def _step_att(self, action, def_act_set):
-        immediateReward = 0
-        index = action - 1
-        action_picked = self.actionspace_att[index]
-        if isinstance(action_picked,tuple):
-            if random.uniform(0,1) <= self.G.edges[action_picked]['actProb']:
-                self.G.nodes[action_picked[-1]]['state'] = 1
-        elif isinstance(action_picked,int):
-            #check AND node
-            if random.uniform(0,1) <= self.G.nodes[action_picked]['actProb']:
-                self.G.nodes[action_picked]['state'] = 1
-        else:
-            raise ValueError("Unacceptable action!")
 
-        for node in def_act_set:
+    # attact and defact are attack set and defence set
+    def _step(self):
+        # immediate reward for both players
+        aReward = 0
+        dReward = 0
+        attact = self.attacker.attact
+        defact = self.defender.defact
+        # attacker's action
+        for attack in attact:
+            if isinstance(attack, tuple):
+                # check OR node
+                aReward += self.G.edges[attack]['cost']
+                if random.uniform(0, 1) <= self.G.edges[attack]['actProb']:
+                    self.G.nodes[attack[-1]]['state'] = 1
+            else:
+                # check AND node
+                aReward += self.G.nodes[attack]['aCost']
+                if random.uniform(0, 1) <= self.G.nodes[attack]['actProb']:
+                    self.G.nodes[attack]['state'] = 1
+        # defender's action
+        for node in defact:
             self.G.nodes[node]['state'] = 0
+            dReward += self.G.nodes[node]['dCost']
+        _, targetset = self.get_Targets()
+        for node in targetset:
+            if self.G.nodes[node]['state'] == 1:
+                aReward += self.G.nodes[node]['aReward']
+                dReward += self.G.nodes[node]['dPenalty']
+        # if goal node prevails for next time step
+        # return true state and obs
+        # return self.get_att_isActive(),self.get_def_hadAlert(),aReward,dReward
+        # TODO: update attacker and defender
+        if self.training_flag == 0: # defender is training
+            self.defender.update_obs(self.get_def_hadAlert())
+            self.defender.cut_prev_obs()
+            self.defender.save_defact2prev()
+            self.defender.cut_prev_defact()
+            self.defender.defact.clear()
+            inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
+            return self.defender.prev_obs + self.defender.observation + \
+               self.defender.prev_defact + self.defender.defact + \
+               inDefenseSet + [self.T - self.current_time], dReward
+        elif self.training_flag == 1: # attacker is training
+            self.attacker.update_obs(self.get_att_isActive())
+            self.attacker.attact.clear()
+            canAttack, inAttackSet = self.attacker.get_att_canAttack_inAttackSet(self.G)
+            self.attacker.set_canAttack(canAttack)
+            # inAttackSet should be all zeros, we can check this.
+            return self.attacker.observation + canAttack + inAttackSet + [self.T - self.current_time], aReward
+        else:
+            raise ValueError("Training flag is set abnormally.")
+        #TODO: refresh canattack, observation for the attacker and similar for the defender.
 
+    # action is a number index for the real action
+    def _step_att(self, action):
+        immediatereward = 0
+        self.attacker.attact.add(action)
+        _, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
+        return self.attacker.observation + self.attacker.canAttack + inAttackset + [self.T - self.current_time], \
+               immediatereward
         #TODO: return obs, reward => DQN
+        #TODO: while attack action set building, the observation is still s rather than s'.
 
     def _step_def(self, action):
-        immediateReward = 0
-        self.G.nodes[action]['state'] = 0
+        immediatereward = 0
+        self.defender.defact.add(action)
+        inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
+        return self.defender.prev_obs + self.defender.observation + \
+               self.defender.prev_defact + self.defender.defact + \
+               inDefenseSet + [self.T - self.current_time], immediatereward
 
         # TODO: return obs, reward => DQN
+        # TODO：hadAlert can only be used once for each time step, so try to save this the def object.
+        # TODO: In att and def step, don't modify the graph. just construct the observation
+        # TODO: Be careful about when to update self.obs/defact. Make sure they are correct.
 
     # Environment step function
-    def step(self, action, defender, attacker, training_flag):
+    def step(self, action):
         #TODO: does not finished.
+        #TODO: deal with time step and stop criterion
         index = action - 1
-        if training_flag == 0: #defender is training
+        if self.training_flag == 0: #defender is training.
             if self.actionspace_def[index] == 'pass':
                 self._step()
             else:
                 self._step_def(action)
-        else:
+        elif self.training_flag == 1: # attacker is training.
             if self.actionspace_att[index] == 'pass':
                 self._step()
             else:
-                self._step_att(action,attacker.#TODO)
-
+                self._step_att(action)
+        else:
+            raise ValueError("In step function, training_flag is invalid.")
 
 
 
@@ -603,7 +634,6 @@ class Environment(object):
     #reset the environment, G_reserved is a copy of the initial env
     def save_graph_copy(self):
         self.G_reserved = self.G.copy()
-
 
     def reset(self):
         self.G = self.G_reserved.copy()
