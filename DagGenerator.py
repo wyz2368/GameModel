@@ -534,7 +534,7 @@ class Environment(object):
     # step function while action set building
 
     # attact and defact are attack set and defence set
-    def _step(self):
+    def _step(self,done = False):
         # immediate reward for both players
         aReward = 0
         dReward = 0
@@ -574,14 +574,14 @@ class Environment(object):
             inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
             return self.defender.prev_obs + self.defender.observation + \
                self.defender.prev_defact + self.defender.defact + \
-               inDefenseSet + [self.T - self.current_time], dReward
+               inDefenseSet + [self.T - self.current_time], dReward, done
         elif self.training_flag == 1: # attacker is training
             self.attacker.update_obs(self.get_att_isActive())
             self.attacker.attact.clear()
             canAttack, inAttackSet = self.attacker.get_att_canAttack_inAttackSet(self.G)
             self.attacker.set_canAttack(canAttack)
             # inAttackSet should be all zeros, we can check this.
-            return self.attacker.observation + canAttack + inAttackSet + [self.T - self.current_time], aReward
+            return self.attacker.observation + canAttack + inAttackSet + [self.T - self.current_time], aReward, done
         else:
             raise ValueError("Training flag is set abnormally.")
         #TODO: refresh canattack, observation for the attacker and similar for the defender.
@@ -609,34 +609,58 @@ class Environment(object):
         # TODO: In att and def step, don't modify the graph. just construct the observation
         # TODO: Be careful about when to update self.obs/defact. Make sure they are correct.
 
+
     # Environment step function
     def step(self, action):
         #TODO: does not finished.
-        #TODO: deal with time step and stop criterion
+        #TODO: deal with time step and stop criterion and done, once done, reset env
         index = action - 1
         if self.training_flag == 0: #defender is training.
             if self.actionspace_def[index] == 'pass':
-                self._step()
+                self.current_time += 1
+                if self.current_time != self.T: #TODO: constructing agent's greedy action set
+                    self._step()
+                else:
+                    self.current_time = 0
+                    self._step(done=True) #TODO: check if reset is right. Reset all agents and return done.
             else:
                 self._step_def(action)
         elif self.training_flag == 1: # attacker is training.
             if self.actionspace_att[index] == 'pass':
-                self._step()
+                self.current_time += 1
+                if self.current_time != self.T:
+                    self._step()
+                else:
+                    self.current_time = 0
+                    self._step(done=True)
             else:
                 self._step_att(action)
         else:
             raise ValueError("In step function, training_flag is invalid.")
 
 
-
-
-
     #reset the environment, G_reserved is a copy of the initial env
     def save_graph_copy(self):
         self.G_reserved = self.G.copy()
 
-    def reset(self):
+    def reset_graph(self):
         self.G = self.G_reserved.copy()
+
+    def reset_everything(self):
+        #TODO: Does not finish.
+        self.reset_graph()
+        self.attacker.reset_att()
+        self.defender.reset_def()
+        if self.training_flag == 0:
+            return 0
+        elif self.training_flag == 1:
+            return 0
+        else:
+            raise ValueError("Training flag is abnormal.")
+
+        #TODO: check how can agent get intial observations. Considering who is training.
+        # Another one is constructing greedy action set!!!!
+
 
     #other APIs similar to OpenAI gym
     def obs_dim_att(self):
