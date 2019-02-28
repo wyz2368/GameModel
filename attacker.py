@@ -35,6 +35,9 @@ class Attacker(object):
     def get_att_canAttack(self, G):
         canAttack = []
         for andnode in self.ANDnodes:
+            if G.nodes[andnode]['root'] == 1:
+                canAttack.append(1)
+                continue
             precondflag = 1
             precond = G.predecessors(andnode)
             for prenode in precond:
@@ -58,6 +61,9 @@ class Attacker(object):
         canAttack = []
         inAttackSet = []
         for andnode in self.ANDnodes:
+            if G.nodes[andnode]['root'] == 1:
+                canAttack.append(1)
+                continue
             if andnode in self.attact:
                 inAttackSet.append(1)
             else:
@@ -99,6 +105,6 @@ class Attacker(object):
         self.canAttack = []
         self.attact.clear()
 
-    def set_canAttack(self,obs):
+    def update_canAttack(self,obs):
         self.canAttack = obs
 

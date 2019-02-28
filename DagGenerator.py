@@ -7,7 +7,7 @@ import attacker
 import defender
 
 class Environment(object):
-
+    #TODO: all representations are logically sorted.
     def __init__(self, num_attr_N = 11, num_attr_E = 4, T=10, graphid=1, numNodes=20, numEdges=10, numRoot=3, numGoals=3, history = 3):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
@@ -29,11 +29,13 @@ class Environment(object):
         self.actionspace_att = self.get_att_actionspace()
         self.actionspace_def = self.get_def_actionspace()
 
+
+    def create_players(self):
         #create players
         self.attacker = attacker.Attacker(oredges=self.get_ORedges(),
                                           andnodes=self.get_ANDnodes(),
                                           actionspace=self.get_def_actionspace())
-        self.defender = defender.Defender()
+        self.defender = defender.Defender(self.G)
 
     def daggenerator_wo_attrs(self,nodeset,edgeset):
         self.G.add_nodes_from(nodeset,
@@ -534,7 +536,7 @@ class Environment(object):
     # step function while action set building
 
     # attact and defact are attack set and defence set#
-    #TODO: construct opponent's action set
+    #TODO: construct opponent's action set, change return to numpy
     def _step(self,done = False):
         # immediate reward for both players
         aReward = 0
@@ -568,9 +570,9 @@ class Environment(object):
             self.defender.save_defact2prev()
             self.defender.defact.clear()
             inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
+            wasdef = self.defender.get_def_wasDefended(self.G)
             return self.defender.prev_obs + self.defender.observation + \
-               self.defender.prev_defact + self.defender.defact + \
-               inDefenseSet + [self.T - self.current_time], dReward, done
+               wasdef + inDefenseSet + [self.T - self.current_time], dReward, done #TODO: defact?
         elif self.training_flag == 1: # attacker is training
             self.attacker.update_obs(self.get_att_isActive())
             self.attacker.attact.clear()
@@ -594,17 +596,15 @@ class Environment(object):
         immediatereward = 0
         self.defender.defact.add(action)
         inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
+        wasdef = self.defender.get_def_wasDefended(self.G)
         return self.defender.prev_obs + self.defender.observation + \
-               self.defender.prev_defact + self.defender.defact + \
-               inDefenseSet + [self.T - self.current_time], immediatereward, False
+               wasdef + inDefenseSet + [self.T - self.current_time], immediatereward, False
 
         # TODO: Be careful about when to update self.obs/defact. Make sure they are correct.
 
 
     # Environment step function
     def step(self, action):
-        #TODO: does not finished.
-        #TODO: deal with time step and stop criterion and done, once done, reset env
         index = action - 1
         if self.training_flag == 0: #defender is training.
             if self.actionspace_def[index] == 'pass':
@@ -612,7 +612,6 @@ class Environment(object):
                 if self.current_time != self.T: #TODO: constructing agent's greedy action set
                     self._step()
                 else:
-                    self.current_time = 0
                     self._step(done=True) #TODO: check if reset is right. Reset all agents and return done.
             else:
                 self._step_def(action)
@@ -622,7 +621,6 @@ class Environment(object):
                 if self.current_time != self.T:
                     self._step()
                 else:
-                    self.current_time = 0
                     self._step(done=True)
             else:
                 self._step_att(action)
@@ -639,13 +637,21 @@ class Environment(object):
 
     def reset_everything(self):
         #TODO: Does not finish.
+        self.current_time = 0
         self.reset_graph()
         self.attacker.reset_att()
         self.defender.reset_def()
-        if self.training_flag == 0:
-            return 0
-        elif self.training_flag == 1:
-            return 0
+        if self.training_flag == 0: # defender is training.
+            self.defender.observation = [0]*self.G.number_of_nodes()
+            inDefenseSet = [0]*self.G.number_of_nodes()
+            wasdef = [0]*self.G.number_of_nodes()*self.history
+            return self.defender.prev_obs + self.defender.observation + \
+               wasdef + inDefenseSet + [self.T - self.current_time]
+        elif self.training_flag == 1: # attacker is training.
+            self.attacker.update_obs([0]*self.G.number_of_nodes())
+            canAttack, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
+            self.attacker.update_canAttack(canAttack)
+            return self.attacker.observation + canAttack + inAttackset + [self.T - self.current_time - 1] # t0=1
         else:
             raise ValueError("Training flag is abnormal.")
 

@@ -4,8 +4,9 @@ import numpy as np
 class Defender(object):
 
     def __init__(self, G):
+        self.num_nodes = G.number_of_nodes
         self.observation = []
-        self.prev_obs = [0]*G.number_of_nodes*self.history
+        self.prev_obs = [0]*self.num_nodes*self.history
 
         self.defact = set()
         self.prev_defact = [set()]*self.history
@@ -103,9 +104,9 @@ class Defender(object):
 
 
 
-    def reset_def(self, G):
+    def reset_def(self):
         self.observation = []
-        self.prev_obs = [0]*G.number_of_nodes*self.history
+        self.prev_obs = [0]*self.num_nodes*self.history
         self.defact.clear()
         self.prev_defact = [set()]*self.history
 
