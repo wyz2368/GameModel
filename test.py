@@ -1,12 +1,6 @@
 import numpy as np
+import networkx as nx
 
-a = np.array([])
-a = np.append(a,12)
-a = np.append(a,1)
-a = np.append(a,15)
-a = np.append(a,16)
-
-
-print(a)
-print(a[-2:])
-
+G = nx.DiGraph()
+G.add_node(1)
+print(G.in_degree(1))

@@ -533,7 +533,8 @@ class Environment(object):
 
     # step function while action set building
 
-    # attact and defact are attack set and defence set
+    # attact and defact are attack set and defence set#
+    #TODO: construct opponent's action set
     def _step(self,done = False):
         # immediate reward for both players
         aReward = 0
@@ -560,16 +561,11 @@ class Environment(object):
         for node in targetset:
             if self.G.nodes[node]['state'] == 1:
                 aReward += self.G.nodes[node]['aReward']
-                dReward += self.G.nodes[node]['dPenalty']
-        # if goal node prevails for next time step
-        # return true state and obs
-        # return self.get_att_isActive(),self.get_def_hadAlert(),aReward,dReward
+
         # TODO: update attacker and defender
         if self.training_flag == 0: # defender is training
             self.defender.update_obs(self.get_def_hadAlert())
-            self.defender.cut_prev_obs()
             self.defender.save_defact2prev()
-            self.defender.cut_prev_defact()
             self.defender.defact.clear()
             inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
             return self.defender.prev_obs + self.defender.observation + \
@@ -584,7 +580,6 @@ class Environment(object):
             return self.attacker.observation + canAttack + inAttackSet + [self.T - self.current_time], aReward, done
         else:
             raise ValueError("Training flag is set abnormally.")
-        #TODO: refresh canattack, observation for the attacker and similar for the defender.
 
     # action is a number index for the real action
     def _step_att(self, action):
@@ -592,8 +587,7 @@ class Environment(object):
         self.attacker.attact.add(action)
         _, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
         return self.attacker.observation + self.attacker.canAttack + inAttackset + [self.T - self.current_time], \
-               immediatereward
-        #TODO: return obs, reward => DQN
+               immediatereward, False
         #TODO: while attack action set building, the observation is still s rather than s'.
 
     def _step_def(self, action):
@@ -602,11 +596,8 @@ class Environment(object):
         inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
         return self.defender.prev_obs + self.defender.observation + \
                self.defender.prev_defact + self.defender.defact + \
-               inDefenseSet + [self.T - self.current_time], immediatereward
+               inDefenseSet + [self.T - self.current_time], immediatereward, False
 
-        # TODO: return obs, reward => DQN
-        # TODO：hadAlert can only be used once for each time step, so try to save this the def object.
-        # TODO: In att and def step, don't modify the graph. just construct the observation
         # TODO: Be careful about when to update self.obs/defact. Make sure they are correct.
 
 
@@ -659,7 +650,7 @@ class Environment(object):
             raise ValueError("Training flag is abnormal.")
 
         #TODO: check how can agent get intial observations. Considering who is training.
-        # Another one is constructing greedy action set!!!!
+        # Another one is constructing greedy action set!!!! Here?
 
 
     #other APIs similar to OpenAI gym
