@@ -12,12 +12,12 @@ class Attacker(object):
         self.actionspace = actionspace
         self.rand_limit = 4
 
-    def att_greedy_action_builder(self, G, timeleft, nn_att):
+    def att_greedy_action_builder(self, G, timeleft):
         self.attact.clear()
         isDup = False
         while not isDup:
             att_input = self.att_obs_constructor(G, timeleft)
-            x = nn_att(att_input[None])[0] #corrensponding to baselines
+            x = self.nn_att(att_input[None])[0] #corrensponding to baselines
             action = self.actionspace[x-1]
             if action == 'pass':
                 break
@@ -108,3 +108,5 @@ class Attacker(object):
     def update_canAttack(self,obs):
         self.canAttack = obs
 
+    def set_current_strategy(self,strategy):
+        self.nn_att = strategy

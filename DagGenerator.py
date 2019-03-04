@@ -13,7 +13,6 @@ class Environment(object):
         self.num_attr_E = num_attr_E
         self.T = T
         self.current_time = 0
-        self.current_time_step = 1
         self.graphid = graphid
         self.G = nx.DiGraph(horizon = T, id = graphid)
         self.history = history
@@ -56,6 +55,7 @@ class Environment(object):
                          cost = 0, # Cost for attacker on OR node, GREATER THAN OR EQUAL TO 0
                          actProb=1.0) # probability of successfully activating, for OR node only
 
+    #TODO: root node must be AND node.
     def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100, EminWeight=0, EmaxWeight=100):
         # Exception handling
         # try:
@@ -489,10 +489,6 @@ class Environment(object):
     def assignAttr_E(self,edge,attr):
         self.G.edges[edge].update(dict(zip(self.G.edges[edge].keys(),attr)))
 
-    #def attrGenerator(num_nodes,num_edges,num_attr_N = 12,num_attr_E = 5,num_targets = 1,num_root = 1):
-    # Hard coding
-    #
-
     ### API FUNCTIONS ###
 
     #return a list of indicator of whether node is activated.
@@ -505,7 +501,7 @@ class Environment(object):
                 isActive.append(0)
         return isActive
 
-    # can be called only once for each time step.
+    # can be called only once for each env time step.
     def get_def_hadAlert(self):
         alert = []
         for node in self.G.nodes:
@@ -541,7 +537,15 @@ class Environment(object):
         # immediate reward for both players
         aReward = 0
         dReward = 0
-        attact = self.attacker.attact
+        #TODO: set nn_def or nn_att first.
+        if self.training_flag == 0: # If the defender is training, attacker builds greedy set. Vice Versa.
+            self.attacker.att_greedy_action_builder(self.G, self.T - self.current_time)
+        elif self.training_flag == 1:
+            self.defender.def_greedy_action_builder(self.G, self.T - self.current_time)
+        else:
+            raise ValueError("training flag error.")
+
+        attact = self.attacker.attact #TODO: check if action sets are correct!
         defact = self.defender.defact
         # attacker's action
         for attack in attact:
@@ -563,23 +567,32 @@ class Environment(object):
         for node in targetset:
             if self.G.nodes[node]['state'] == 1:
                 aReward += self.G.nodes[node]['aReward']
+                dReward += self.G.nodes[node]['dPenalty']
 
-        # TODO: update attacker and defender
+        # TODO: update attacker and defender after graph has been changed.
         if self.training_flag == 0: # defender is training
+            # attacker updates obs
+            self.attacker.update_obs(self.get_att_isActive())
+            # defender updates obs and defact
             self.defender.update_obs(self.get_def_hadAlert())
             self.defender.save_defact2prev()
             self.defender.defact.clear()
-            inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
+            inDefenseSet = self.defender.get_def_inDefenseSet(self.G) #should be all zeros.
             wasdef = self.defender.get_def_wasDefended(self.G)
-            return self.defender.prev_obs + self.defender.observation + \
-               wasdef + inDefenseSet + [self.T - self.current_time], dReward, done #TODO: defact?
+            return np.array(self.defender.prev_obs + self.defender.observation + \
+               wasdef + inDefenseSet + [self.T - self.current_time]), dReward, done
+
         elif self.training_flag == 1: # attacker is training
+            # defender updates obs and defact. Don't need to clear defset since it's done in greedy builder.
+            self.defender.update_obs(self.get_def_hadAlert())
+            self.defender.save_defact2prev()
+            # attacker updates obs
             self.attacker.update_obs(self.get_att_isActive())
             self.attacker.attact.clear()
             canAttack, inAttackSet = self.attacker.get_att_canAttack_inAttackSet(self.G)
-            self.attacker.set_canAttack(canAttack)
+            self.attacker.update_canAttack(canAttack)
             # inAttackSet should be all zeros, we can check this.
-            return self.attacker.observation + canAttack + inAttackSet + [self.T - self.current_time], aReward, done
+            return np.array(self.attacker.observation + canAttack + inAttackSet + [self.T - self.current_time]), aReward, done
         else:
             raise ValueError("Training flag is set abnormally.")
 
@@ -588,28 +601,27 @@ class Environment(object):
         immediatereward = 0
         self.attacker.attact.add(action)
         _, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
-        return self.attacker.observation + self.attacker.canAttack + inAttackset + [self.T - self.current_time], \
+        return np.array(self.attacker.observation + self.attacker.canAttack + inAttackset + [self.T - self.current_time]), \
                immediatereward, False
-        #TODO: while attack action set building, the observation is still s rather than s'.
 
     def _step_def(self, action):
         immediatereward = 0
         self.defender.defact.add(action)
         inDefenseSet = self.defender.get_def_inDefenseSet(self.G)
-        wasdef = self.defender.get_def_wasDefended(self.G)
-        return self.defender.prev_obs + self.defender.observation + \
-               wasdef + inDefenseSet + [self.T - self.current_time], immediatereward, False
+        wasdef = self.defender.get_def_wasDefended(self.G) # May be improved since it's the same within internal clock.
+        return np.array(self.defender.prev_obs + self.defender.observation + \
+               wasdef + inDefenseSet + [self.T - self.current_time]), immediatereward, False
 
         # TODO: Be careful about when to update self.obs/defact. Make sure they are correct.
 
 
     # Environment step function
     def step(self, action):
-        index = action - 1
+        index = action - 1 #TODO: make sure action starting from 0 or 1.
         if self.training_flag == 0: #defender is training.
             if self.actionspace_def[index] == 'pass':
                 self.current_time += 1
-                if self.current_time != self.T: #TODO: constructing agent's greedy action set
+                if self.current_time < self.T:
                     self._step()
                 else:
                     self._step(done=True) #TODO: check if reset is right. Reset all agents and return done.
@@ -618,7 +630,7 @@ class Environment(object):
         elif self.training_flag == 1: # attacker is training.
             if self.actionspace_att[index] == 'pass':
                 self.current_time += 1
-                if self.current_time != self.T:
+                if self.current_time < self.T:
                     self._step()
                 else:
                     self._step(done=True)
@@ -645,13 +657,12 @@ class Environment(object):
             self.defender.observation = [0]*self.G.number_of_nodes()
             inDefenseSet = [0]*self.G.number_of_nodes()
             wasdef = [0]*self.G.number_of_nodes()*self.history
-            return self.defender.prev_obs + self.defender.observation + \
-               wasdef + inDefenseSet + [self.T - self.current_time]
+            return np.array(self.defender.prev_obs + self.defender.observation + wasdef + inDefenseSet + [self.T - self.current_time])
         elif self.training_flag == 1: # attacker is training.
             self.attacker.update_obs([0]*self.G.number_of_nodes())
             canAttack, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
             self.attacker.update_canAttack(canAttack)
-            return self.attacker.observation + canAttack + inAttackset + [self.T - self.current_time - 1] # t0=1
+            return np.array(self.attacker.observation + canAttack + inAttackset + [self.T - self.current_time]) # t0=0
         else:
             raise ValueError("Training flag is abnormal.")
 
@@ -681,8 +692,8 @@ class Environment(object):
         self.training_flag = flag
         # This flag is just a copy of who is training now. Each player inputs another flag to step function while training
 
-
-
+    def set_current_time(self,time):
+        self.current_time = time
 
 """
 test = Environment()
