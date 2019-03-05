@@ -10,7 +10,6 @@ class Attacker(object):
         self.ORedges = oredges
         self.ANDnodes = andnodes
         self.actionspace = actionspace
-        self.rand_limit = 4
 
     def att_greedy_action_builder(self, G, timeleft):
         self.attact.clear()
@@ -91,11 +90,11 @@ class Attacker(object):
 
         return canAttack, inAttackSet
 
-    def uniform_strategy(self,G):
+    def uniform_strategy(self,G, rand_limit):
         actmask = self.get_att_canAttack(G)
         attSet = self.ANDnodes + self.ORedges
         actset_masked = list(x for x, z in zip(attSet, actmask) if z)
-        return random.choices(actset_masked,k = self.rand_limit)
+        return set(sorted(random.sample(actset_masked,rand_limit)))
 
     def update_obs(self, obs):
         self.observation = obs

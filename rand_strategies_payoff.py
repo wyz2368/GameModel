@@ -1,23 +1,20 @@
 import random
 import numpy as np
 
-def simulation(env, attacker, nn_att, defender, nn_def, num_episodes):
-    #TODO: APIs have been changed.
+def rand_strategies_payoff(env, num_episodes):
     aReward_list = np.array([])
     dReward_list = np.array([])
+    num_resource_def = 4
+    num_resource_att = 4
 
     for i in range(num_episodes): #can be run parallel
         aReward = 0
         dReward = 0
         env.G.reset()
-        attacker.reset_att()
-        defender.reset_def()
+        env.attacker.reset_att()
         for t in range(env.T):
-            timeleft = env.T - t
-            attacker.att_greedy_action_builder(env.G, timeleft, nn_att)
-            att_action_set = attacker.attact
-            defender.def_greedy_action_builder(env.G, timeleft, nn_def)
-            def_action_set = defender.defact
+            att_action_set = env.attacker.uniform_strategy(env.G, num_resource_att)
+            def_action_set = set(sorted(random.sample(list(env.G.nodes), num_resource_def)))
             for attack in att_action_set:
                 if isinstance(attack, tuple):
                     # check OR node
@@ -43,3 +40,6 @@ def simulation(env, attacker, nn_att, defender, nn_def, num_episodes):
         dReward_list = np.append(dReward_list,dReward)
 
     return np.mean(aReward_list), np.mean(dReward_list)
+
+
+

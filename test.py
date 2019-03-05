@@ -1,5 +1,6 @@
 import numpy as np
 import networkx as nx
+import random
 
 G = nx.DiGraph()
 
@@ -9,18 +10,27 @@ a = []
 
 a += G.in_edges(2)
 
-print(a)
-print(G.number_of_nodes())
-print(G.number_of_edges())
-print(G.in_degree(6))
-print(G.out_degree(2))
-print(set(G.predecessors(6)))
-print(set(G.successors(2)))
-print(nx.is_directed_acyclic_graph(G))
-print(G.edges())
-print(G.nodes())
-print(G.nodes[1])
-print(G.in_edges(6))
+# print(a)
+# print(G.number_of_nodes())
+# print(G.number_of_edges())
+# print(G.in_degree(6))
+# print(G.out_degree(2))
+# print(set(G.predecessors(6)))
+# print(set(G.successors(2)))
+# print(nx.is_directed_acyclic_graph(G))
+# print(G.edges())
+# print(list(G.nodes()))
+# print(G.nodes[1])
+# print(G.in_edges(6))
+#
+# a += G.in_edges(6)
+# print(a)
 
-a += G.in_edges(6)
-print(a)
+G1 = nx.DiGraph()
+G1.add_node(3)
+G1.add_node(1)
+G1.add_node(0)
+G1.add_node(7)
+G1.add_node(2)
+G1.add_node(11)
+print(sorted(G1.nodes))

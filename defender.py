@@ -64,7 +64,7 @@ class Defender(object):
         return actionspace
 
     def uniform_strategy(self, G):
-        return set(random.choices(list(G.nodes), k = self.rand_limit))
+        return set(sorted(random.sample(list(G.nodes), self.rand_limit)))
 
     def cut_prev_obs(self):
         if len(self.prev_obs)/self.num_nodes > self.history - 1:
