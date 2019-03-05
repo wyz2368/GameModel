@@ -28,6 +28,8 @@ class Environment(object):
         self.actionspace_att = self.get_att_actionspace()
         self.actionspace_def = self.get_def_actionspace()
 
+        #Initialize attacker and defender
+
 
     def create_players(self):
         #create players
@@ -448,13 +450,14 @@ class Environment(object):
         return count, Orset
 
     def get_ORedges(self):
-        ornodes = self.get_ORnodes()
+        _, ornodes = self.get_ORnodes()
         oredges = []
         for node in ornodes:
-            oredges.append(self.G.in_edges(node))
+            oredges += self.G.in_edges(node)
         oredges = self.sortEdge(oredges)
         return len(oredges), oredges
 
+    #TODO: fix [[a]] problem
     def get_Targets(self):
         count = 0
         targetset = set()
@@ -668,7 +671,6 @@ class Environment(object):
 
         #TODO: check how can agent get intial observations. Considering who is training.
         # Another one is constructing greedy action set!!!! Here?
-
 
     #other APIs similar to OpenAI gym
     def obs_dim_att(self):
