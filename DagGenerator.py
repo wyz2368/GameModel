@@ -8,6 +8,7 @@ import defender
 
 class Environment(object):
     #TODO: all representations are logically sorted.！！！！
+    #TODO: use random label. Move random label to simulation.
     def __init__(self, num_attr_N = 11, num_attr_E = 4, T=10, graphid=1, numNodes=20, numEdges=10, numRoot=3, numGoals=3, history = 3):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
@@ -27,6 +28,11 @@ class Environment(object):
         # defender's and attacker's action space
         self.actionspace_att = self.get_att_actionspace()
         self.actionspace_def = self.get_def_actionspace()
+
+        #random label: = -1 no one is playing random strategy
+        # = 0: defender is playing random strategy
+        # = 1: attacker is playing ramdom strategy
+        self.random_label = -1
 
         #Initialize attacker and defender
 
@@ -692,7 +698,9 @@ class Environment(object):
 
     def set_training_flag(self, flag):
         self.training_flag = flag
-        # This flag is just a copy of who is training now. Each player inputs another flag to step function while training
+
+    def set_random_label(self,label):
+        self.random_label = label
 
     def set_current_time(self,time):
         self.current_time = time

@@ -1,9 +1,8 @@
 import numpy as np
 
 class Game_data(object):
-    def __init__(self,id,env):
+    def __init__(self,env):
         self.env = env
-        self.graph_id = id
         self.att_str = []
         self.def_str = []
         self.nasheq = {}
