@@ -1,4 +1,5 @@
 import numpy as np
+import file_op as fp
 
 class Game_data(object):
     def __init__(self,env):
@@ -8,9 +9,12 @@ class Game_data(object):
         self.nasheq = {}
         self.payoffmatrix_def = np.zeros((1,1))
         self.payoffmatrix_att = np.zeros((1,1))
+        self.dir = './' #TODO: Set dir. Maybe need to separate for the defender and the attacker.
 
     def add_att_str(self, str_name):
         # TODO: check if str_name is an attacker's strategy and if it exists.
+        if not fp.isExist(self.dir + str_name):
+            raise ValueError("This strategy does not exist.")
         if not isinstance(str_name,str):
             raise ValueError("The name to be added is not a str." )
         self.att_str.append(str_name)
@@ -18,13 +22,12 @@ class Game_data(object):
 
     def add_def_str(self, str_name):
         # TODO: check if str_name is an attacker's strategy and if it exists.
+        if not fp.isExist(self.dir + str_name):
+            raise ValueError("This strategy does not exist.")
         if not isinstance(str_name,str):
             raise ValueError("The name to be added is not a str." )
         self.def_str.append(str_name)
         print(str_name + " has been added to attacker's strategy set")
-
-    def get_graph_id(self):
-        return self.graph_id
 
     def init_payoffmatrix(self, payoff_def, payoff_att):
         self.payoffmatrix_def[0,0] = payoff_def
