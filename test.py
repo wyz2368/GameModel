@@ -3,6 +3,7 @@ import networkx as nx
 import random
 import itertools
 import time
+import training
 
 G = nx.DiGraph()
 
@@ -37,13 +38,12 @@ a += G.in_edges(2)
 # G1.add_node(11)
 # print(sorted(G1.nodes))
 
-t1 = time.time()
-a = []
-for i in range(400):
-    a.append(G.copy())
-t2 = time.time()
-print(t2-t1)
-print(a[0].nodes)
-a[1].add_node(10)
-print(a[1].nodes)
-print(a[0].nodes)
+# t1 = time.time()
+# a = []
+# for i in range(400):
+#     a.append(G.copy())
+# t2 = time.time()
+# print(t2-t1)
+# print(a[0].nodes)
+# a[1].add_node(10)
+# print(a[1].nodes)

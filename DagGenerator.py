@@ -656,7 +656,7 @@ class Environment(object):
     def reset_graph(self):
         self.G = self.G_reserved.copy()
 
-    def reset_everything(self):
+    def reset_everything_with_return(self):
         #TODO: Does not finish.
         self.current_time = 0
         self.reset_graph()
@@ -677,6 +677,25 @@ class Environment(object):
 
         #TODO: check how can agent get intial observations. Considering who is training.
         # Another one is constructing greedy action set!!!! Here?
+
+    def reset_everything(self):
+        #TODO: Does not finish.
+        self.current_time = 0
+        self.reset_graph()
+        self.attacker.reset_att()
+        self.defender.reset_def()
+        # if self.training_flag == 0: # defender is training.
+        #     self.defender.observation = [0]*self.G.number_of_nodes()
+        #     inDefenseSet = [0]*self.G.number_of_nodes()
+        #     wasdef = [0]*self.G.number_of_nodes()*self.history
+        #     return np.array(self.defender.prev_obs + self.defender.observation + wasdef + inDefenseSet + [self.T - self.current_time])
+        # elif self.training_flag == 1: # attacker is training.
+        #     self.attacker.update_obs([0]*self.G.number_of_nodes())
+        #     canAttack, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
+        #     self.attacker.update_canAttack(canAttack)
+        #     return np.array(self.attacker.observation + canAttack + inAttackset + [self.T - self.current_time]) # t0=0
+        # else:
+        #     raise ValueError("Training flag is abnormal.")
 
     #other APIs similar to OpenAI gym
     def obs_dim_att(self):
