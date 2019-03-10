@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import game_data as dg
 
 def simulation(env, attacker, nn_att, defender, nn_def, num_episodes):
     #TODO: APIs have been changed.
@@ -43,3 +44,5 @@ def simulation(env, attacker, nn_att, defender, nn_def, num_episodes):
         dReward_list = np.append(dReward_list,dReward)
 
     return np.mean(aReward_list), np.mean(dReward_list)
+
+# def simulation_all(att_str_list, def_str_list):
