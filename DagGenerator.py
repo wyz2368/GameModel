@@ -126,14 +126,12 @@ class Environment(object):
             self.setACost_N(nodeID, np.random.uniform(0, NmaxACost))
             self.setposActiveProb_N(nodeID, np.random.uniform(0, 1))
             self.setposInactiveProb_N(nodeID, np.random.uniform(0, 1))
-            self.setTopoPosition_N(nodeID, -1)
 
         # Set random edge attributes
         for edgeID, edge in enumerate(self.G.edges):
             self.setid_E(edge, edgeID)
             self.setType_E(edge, np.random.randint(2))
             self.setACost_E(edge, np.random.uniform(0, EmaxACost))
-            self.setweight_E(edge, np.random.uniform(EminWeight, EmaxWeight))
             self.setActProb_E(edge, np.random.uniform(0, 1))
 
     # Parameter Format:
@@ -155,12 +153,11 @@ class Environment(object):
             self.setACost_N(nodeID, attributesDict['NaCosts'][nodeID])
             self.setposActiveProb_N(nodeID, attributesDict['NposActiveProbs'][nodeID])
             self.setposInactiveProb_N(nodeID, attributesDict['NposInactiveProbs'][nodeID])
-            self.setTopoPosition_N(nodeID, attributesDict['NtopoPositions'][nodeID])
+
         for edge in range(attributesDict['edges']):
             self.setid_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['Eeids'][edge])
             self.setType_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['Etypes'][edge])
             self.setACost_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['Ecosts'][edge])
-            self.setweight_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['Eweights'][edge])
             self.setActProb_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['actProb'][edge])
 
     # Visualizes DAG
