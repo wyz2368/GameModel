@@ -4,14 +4,14 @@ import numpy as np
 class Defender(object):
 
     def __init__(self, G):
-        self.num_nodes = G.number_of_nodes
+        self.num_nodes = G.number_of_nodes()
         self.observation = []
+        self.history = 3
         self.prev_obs = [0]*self.num_nodes*(self.history - 1)
 
         self.defact = set()
         self.prev_defact = [set()]*self.history
 
-        self.history = 3
         self.rand_limit = 4
 
     def def_greedy_action_builder(self, G, timeleft):

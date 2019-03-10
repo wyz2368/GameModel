@@ -57,16 +57,18 @@ class Attacker(object):
         return canAttack
 
     def get_att_canAttack_inAttackSet(self, G):
+        #TODO: Check if attact includes illegal actions besides andnodes and edges.
         canAttack = []
         inAttackSet = []
         for andnode in self.ANDnodes:
-            if G.nodes[andnode]['root'] == 1:
-                canAttack.append(1)
-                continue
             if andnode in self.attact:
                 inAttackSet.append(1)
             else:
                 inAttackSet.append(0)
+
+            if G.nodes[andnode]['root'] == 1:
+                canAttack.append(1)
+                continue
             precondflag = 1
             precond = G.predecessors(andnode)
             for prenode in precond:
@@ -91,8 +93,9 @@ class Attacker(object):
         return canAttack, inAttackSet
 
     def uniform_strategy(self,G, rand_limit):
+        #TODO: rand_limit should be less than number of available actions.
         actmask = self.get_att_canAttack(G)
-        attSet = self.ANDnodes + self.ORedges
+        attSet = list(self.ANDnodes) + self.ORedges
         actset_masked = list(x for x, z in zip(attSet, actmask) if z)
         return set(sorted(random.sample(actset_masked,rand_limit)))
 

@@ -40,9 +40,11 @@ class Environment(object):
     def create_players(self):
         #create players
         #TODO: test if the graph has been initialized.
-        self.attacker = attacker.Attacker(oredges=self.get_ORedges(),
-                                          andnodes=self.get_ANDnodes(),
-                                          actionspace=self.get_def_actionspace())
+        _,oredges=self.get_ORedges()
+        _,andnodes=self.get_ANDnodes()
+        self.attacker = attacker.Attacker(oredges=oredges,
+                                          andnodes=andnodes,
+                                          actionspace=self.get_att_actionspace())
         self.defender = defender.Defender(self.G)
 
     def daggenerator_wo_attrs(self,nodeset,edgeset):
@@ -65,8 +67,7 @@ class Environment(object):
                          actProb=1.0) # probability of successfully activating, for OR node only
 
     #TODO: root node must be AND node.
-    def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100, EminWeight=0,
-                  EmaxWeight=100):
+    def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100):
         # Exception handling
         # try:
         #     if self.numRoot + self.numGoals > self.numNodes:
@@ -136,29 +137,36 @@ class Environment(object):
 
     # Parameter Format:
     #    AttributesDict: Dictionary of the following attributes:
-    #	Nodes = List of N integers, representing Node IDs.
+    #	 Nodes = List of N integers, representing Node IDs.
     #    Edges = List of E Tuples, representing Edges.
     #    Nroots, Ntypes, NeTypes, Nstates, NaRewards, NdPenalties, NdCosts, NaCosts, NposActiveProbs, NposInacriveProbs, NtopoPositions:
     #    Size N list. Each List[x] attribute correspondes to the node in position nodes[x].
-    def specifiedDAG(self, attributesDict):
-        self.daggenerator_wo_attrs(attributesDict['nodes'], attributesDict['edges'])
-        for nodeID in range(attributesDict['nodes']):
-            self.setRoot_N(nodeID, attributesDict['Nroots'][nodeID])
-            self.setType_N(nodeID, attributesDict['Ntypes'][nodeID])
-            self.setActivationType_N(nodeID, attributesDict['NeTypes'][nodeID])
-            self.setState_N(nodeID, attributesDict['Nstates'][nodeID])
-            self.setAReward_N(nodeID, attributesDict['NaRewards'][nodeID])
-            self.setDPenalty_N(nodeID, attributesDict['NdPenalties'][nodeID])
-            self.setDCost_N(nodeID, attributesDict['NdCosts'][nodeID])
-            self.setACost_N(nodeID, attributesDict['NaCosts'][nodeID])
-            self.setposActiveProb_N(nodeID, attributesDict['NposActiveProbs'][nodeID])
-            self.setposInactiveProb_N(nodeID, attributesDict['NposInactiveProbs'][nodeID])
 
-        for edge in range(attributesDict['edges']):
-            self.setid_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['Eeids'][edge])
-            self.setType_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['Etypes'][edge])
-            self.setACost_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['Ecosts'][edge])
-            self.setActProb_E((attributesDict['edges'][0], attributesDict['edges'][1]), attributesDict['actProb'][edge])
+    # TODO: remove the first line. Check if G has been initialized.
+    def specifiedDAG(self, attributesDict):
+        # self.daggenerator_wo_attrs(attributesDict['nodes'], attributesDict['edges'])
+        for nodeID in attributesDict['nodes']:
+            self.setRoot_N(nodeID, attributesDict['Nroots'][nodeID-1])
+            self.setType_N(nodeID, attributesDict['Ntypes'][nodeID-1])
+            self.setActivationType_N(nodeID, attributesDict['NeTypes'][nodeID-1])
+            self.setState_N(nodeID, attributesDict['Nstates'][nodeID-1])
+            self.setAReward_N(nodeID, attributesDict['NaRewards'][nodeID-1])
+            self.setDPenalty_N(nodeID, attributesDict['NdPenalties'][nodeID-1])
+            self.setDCost_N(nodeID, attributesDict['NdCosts'][nodeID-1])
+            self.setACost_N(nodeID, attributesDict['NaCosts'][nodeID-1])
+            self.setposActiveProb_N(nodeID, attributesDict['NposActiveProbs'][nodeID-1])
+            self.setposInactiveProb_N(nodeID, attributesDict['NposInactiveProbs'][nodeID-1])
+            self.setActProb_N(nodeID,attributesDict['NactProbs'][nodeID-1])
+
+        idx = 0
+        for edge in attributesDict['edges']:
+            self.setid_E(edge, attributesDict['Eeids'][idx])
+            self.setType_E(edge, attributesDict['Etypes'][idx])
+            self.setACost_E(edge, attributesDict['Ecosts'][idx])
+            self.setActProb_E(edge, attributesDict['actProb'][idx])
+            idx += 1
+
+
 
     # Visualizes DAG
     # Node did not visualize: aReward, dPenalty, dCost, aCost, posActiveProb, posInactiveProb, actProb, topoPosition
@@ -398,8 +406,8 @@ class Environment(object):
 
     def setACost_E(self,edge,value):
         try:
-            if value < 0:
-                raise Exception("Cost for attacker on OR node must be greater than or equal to 0.")
+            if value > 0:
+                raise Exception("Cost for attacker on edge to OR node must be greater than or equal to 0.")
             else:
                  self.G.edges[edge]['cost'] = value
         except Exception as error:
@@ -538,9 +546,11 @@ class Environment(object):
         return alert
 
     def get_att_actionspace(self):
-        num_andnode, _ = self.get_ANDnodes()
+        #TODO: and node could be anywhere, just recognize andnode and sort
+        _, andnodes = self.get_ANDnodes()
         _, oregdes = self.get_ORedges()
-        actionspace = [i+1 for i in range(num_andnode)] + oregdes + ['pass']
+        # actionspace = [i+1 for i in range(num_andnode)] + oregdes + ['pass']
+        actionspace = sorted(list(andnodes)) + oregdes + ['pass']
         return actionspace
 
     def get_def_actionspace(self):
