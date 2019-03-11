@@ -33,17 +33,92 @@ env.daggenerator_wo_attrs(nodeset, edgeset)
 env.specifiedDAG(attr)
 env.save_graph_copy()
 
+# env.visualize()
+
 # print(env.G.nodes.data()[4])
 # print(env.G.edges.data())
 
 env.create_players()
 
 #test attacker
-print(env.attacker.ORedges)
-print(env.attacker.ANDnodes)
-print(env.attacker.actionspace)
-print(env.attacker.get_att_canAttack_inAttackSet(env.G))
-print(env.attacker.uniform_strategy(env.G,1))
-env.attacker.update_canAttack(env.attacker.get_att_canAttack(env.G))
-print(env.attacker.canAttack)
+# print(env.attacker.ORedges)
+# print(env.attacker.ANDnodes)
+# print(env.attacker.actionspace)
+# print(env.attacker.get_att_canAttack_inAttackSet(env.G))
+# print(env.attacker.uniform_strategy(env.G,1))
+# env.attacker.update_canAttack(env.attacker.get_att_canAttack(env.G))
+# print(env.attacker.canAttack)
+# env.attacker.reset_att()
+# print(env.attacker.canAttack)
+
 #test defender
+# print(env.defender.num_nodes)
+# print(env.defender.observation)
+# print(env.defender.history)
+# print(env.defender.prev_obs)
+# print(env.defender.defact)
+# print(env.defender.prev_defact)
+# print(env.defender.rand_limit)
+
+env.defender.defact.add(2)
+env.defender.defact.add(3)
+env.defender.defact.add(5)
+
+print(env.defender.get_def_wasDefended(env.G))
+print(env.defender.get_def_inDefenseSet(env.G))
+print(env.defender.get_def_actionspace(env.G))
+print(env.defender.uniform_strategy(env.G))
+
+env.defender.update_obs([0,0,0,0,1])
+print(env.defender.observation)
+
+env.defender.save_defact2prev()
+
+print('*******')
+print(env.defender.observation)
+print(env.defender.prev_obs)
+print(env.defender.defact)
+print(env.defender.prev_defact)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

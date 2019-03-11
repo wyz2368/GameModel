@@ -75,10 +75,12 @@ class Defender(object):
             self.prev_defact = self.prev_defact[-self.history:]
 
     def save_defact2prev(self):
+        print("Don't forget to update defact after save_defact2prev.")
         self.prev_defact.append(self.defact)
         self.cut_prev_defact()
 
     def update_obs(self, obs):
+        #TODO: check obs update for the first time step
         self.prev_obs += self.observation #TODO: prev_obs is a list. Do not append.
         self.cut_prev_obs()
         self.observation = obs

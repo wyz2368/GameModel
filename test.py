@@ -4,6 +4,7 @@ import random
 import itertools
 import time
 import training
+import tensorflow as tf
 
 G = nx.DiGraph()
 
@@ -47,3 +48,7 @@ a += G.in_edges(2)
 # print(a[0].nodes)
 # a[1].add_node(10)
 # print(a[1].nodes)
+
+random_actions = tf.random_uniform([10], minval=0, maxval=5, dtype=tf.int64)
+sess = tf.Session()
+print(sess.run(random_actions))

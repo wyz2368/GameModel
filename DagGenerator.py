@@ -171,6 +171,7 @@ class Environment(object):
     # Visualizes DAG
     # Node did not visualize: aReward, dPenalty, dCost, aCost, posActiveProb, posInactiveProb, actProb, topoPosition
     # Edge did not visualize: eid, cost, weight, actProb
+    #TODO:Does not work
     def visualize(self):
         nodePos = nx.layout.spring_layout(self.G)
         # Local variable initialization
