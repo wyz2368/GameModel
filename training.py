@@ -26,6 +26,7 @@ def training_att(env,mix_str_def,epoch):
     )
     print("Saving attacker's model to pickle.")
     act_att.save(DIR_att + "att_str_epoch" + str(epoch) + ".pkl")
+    return act_att
 
 
 def training_def(env,mix_str_att,epoch):
@@ -47,5 +48,5 @@ def training_def(env,mix_str_att,epoch):
     )
     print("Saving defender's model to pickle.")
     act_def.save(DIR_def + "def_str_epoch" + str(epoch) + ".pkl")
-
+    return act_def
 

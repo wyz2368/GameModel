@@ -573,6 +573,7 @@ class Environment(object):
         aReward = 0
         dReward = 0
         #TODO: set nn_def or nn_att first.
+        #TODO: check the logic of saving act to prev_act
         if self.training_flag == 0: # If the defender is training, attacker builds greedy set. Vice Versa.
             self.attacker.att_greedy_action_builder(self.G, self.T - self.current_time)
         elif self.training_flag == 1:
@@ -605,6 +606,7 @@ class Environment(object):
                 dReward += self.G.nodes[node]['dPenalty']
 
         # TODO: update attacker and defender after graph has been changed.
+        # TODO: was_defended mismatches?
         if self.training_flag == 0: # defender is training
             # attacker updates obs
             self.attacker.update_obs(self.get_att_isActive())
@@ -621,6 +623,7 @@ class Environment(object):
             # defender updates obs and defact. Don't need to clear defset since it's done in greedy builder.
             self.defender.update_obs(self.get_def_hadAlert())
             self.defender.save_defact2prev()
+            self.defender.defact.clear()
             # attacker updates obs
             self.attacker.update_obs(self.get_att_isActive())
             self.attacker.attact.clear()
@@ -636,6 +639,7 @@ class Environment(object):
         immediatereward = 0
         self.attacker.attact.add(action)
         _, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
+        # Notice that canAttack is updated in the _step.
         return np.array(self.attacker.observation + self.attacker.canAttack + inAttackset + [self.T - self.current_time]), \
                immediatereward, False
 
@@ -652,25 +656,26 @@ class Environment(object):
 
     # Environment step function
     def step(self, action):
-        index = action #TODO: make sure action starting from 0 or 1.
         if self.training_flag == 0: #defender is training.
-            if self.actionspace_def[index] == 'pass':
+            true_action = self.actionspace_def[action]
+            if true_action == 'pass':
                 self.current_time += 1
-                if self.current_time < self.T:
+                if self.current_time < self.T: #TODO:Check the logics
                     self._step()
                 else:
                     self._step(done=True) #TODO: check if reset is right. Reset all agents and return done.
             else:
-                self._step_def(action)
+                self._step_def(true_action)
         elif self.training_flag == 1: # attacker is training.
-            if self.actionspace_att[index] == 'pass':
+            true_action = self.actionspace_att[action]
+            if true_action == 'pass':
                 self.current_time += 1
                 if self.current_time < self.T:
                     self._step()
                 else:
                     self._step(done=True)
             else:
-                self._step_att(action)
+                self._step_att(true_action)
         else:
             raise ValueError("In step function, training_flag is invalid.")
 
@@ -697,6 +702,7 @@ class Environment(object):
         elif self.training_flag == 1: # attacker is training.
             self.attacker.update_obs([0]*self.G.number_of_nodes())
             canAttack, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
+            #canAttack should be root nodes.
             self.attacker.update_canAttack(canAttack)
             return np.array(self.attacker.observation + canAttack + inAttackset + [self.T - self.current_time]) # t0=0
         else:
@@ -711,18 +717,7 @@ class Environment(object):
         self.reset_graph()
         self.attacker.reset_att()
         self.defender.reset_def()
-        # if self.training_flag == 0: # defender is training.
-        #     self.defender.observation = [0]*self.G.number_of_nodes()
-        #     inDefenseSet = [0]*self.G.number_of_nodes()
-        #     wasdef = [0]*self.G.number_of_nodes()*self.history
-        #     return np.array(self.defender.prev_obs + self.defender.observation + wasdef + inDefenseSet + [self.T - self.current_time])
-        # elif self.training_flag == 1: # attacker is training.
-        #     self.attacker.update_obs([0]*self.G.number_of_nodes())
-        #     canAttack, inAttackset = self.attacker.get_att_canAttack_inAttackSet(self.G)
-        #     self.attacker.update_canAttack(canAttack)
-        #     return np.array(self.attacker.observation + canAttack + inAttackset + [self.T - self.current_time]) # t0=0
-        # else:
-        #     raise ValueError("Training flag is abnormal.")
+
 
     #other APIs similar to OpenAI gym
     def obs_dim_att(self):
