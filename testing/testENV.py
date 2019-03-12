@@ -138,8 +138,6 @@ env.create_players()
 # test step functions
 
 
-print(env.G_reserved.nodes)
-
 
 
 
