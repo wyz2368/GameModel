@@ -9,12 +9,15 @@ class Game_data(object):
         self.nasheq = {}
         self.payoffmatrix_def = np.zeros((1,1))
         self.payoffmatrix_att = np.zeros((1,1))
-        self.dir = './' #TODO: Set dir. Maybe need to separate for the defender and the attacker.
+        self.dir_def = './defender_strategies/'
+        self.dir_att = './attacker_strategies/'
 
     def add_att_str(self, str_name):
         # TODO: check if str_name is an attacker's strategy and if it exists.
-        if not fp.isExist(self.dir + str_name):
+        if not fp.isExist(self.dir_att + str_name):
             raise ValueError("This strategy does not exist.")
+        if '_att' not in str_name:
+            raise ValueError("This may not be an attacker's strategy due to no def sign")
         if not isinstance(str_name,str):
             raise ValueError("The name to be added is not a str." )
         self.att_str.append(str_name)
@@ -22,8 +25,10 @@ class Game_data(object):
 
     def add_def_str(self, str_name):
         # TODO: check if str_name is an attacker's strategy and if it exists.
-        if not fp.isExist(self.dir + str_name):
+        if not fp.isExist(self.dir_def + str_name):
             raise ValueError("This strategy does not exist.")
+        if '_def' not in str_name:
+            raise ValueError("This may not be a defender's strategy due to no def sign")
         if not isinstance(str_name,str):
             raise ValueError("The name to be added is not a str." )
         self.def_str.append(str_name)
@@ -35,12 +40,12 @@ class Game_data(object):
         print("Payoff matrix has been initilized by" + " " + str(payoff_def) + " for the defender.")
         print("Payoff matrix has been initilized by" + " " + str(payoff_att) + " for the attacker.")
 
-    def add_nasheq(self, att_str, def_str, ne):
-        if att_str not in self.att_str:
-            raise ValueError("Attacker's strategy does not exist.")
-        if def_str not in self.def_str:
-            raise ValueError("Defender's strategy does not exist.")
-        self.nasheq[(def_str,att_str)] = ne
+    #TODO: design the data structure of ne.
+    def add_nasheq(self, ne_name, ne):
+        if not isinstance(ne_name,str):
+            raise ValueError("The ne name to be added is not a str." )
+        self.nasheq[ne_name] = ne
+
 
     ''' 
     >>> import numpy as np

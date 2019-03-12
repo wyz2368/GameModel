@@ -746,8 +746,3 @@ class Environment(object):
     def set_current_time(self,time):
         self.current_time = time
 
-"""
-test = Environment()
-test.randomDAG(1,1)
-test.visualize()
-"""
