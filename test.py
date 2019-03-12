@@ -5,6 +5,7 @@ import itertools
 import time
 import training
 import tensorflow as tf
+from mpi4py import MPI
 
 G = nx.DiGraph()
 

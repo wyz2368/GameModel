@@ -48,6 +48,10 @@ class Environment(object):
         self.defender = defender.Defender(self.G)
 
     def daggenerator_wo_attrs(self,nodeset,edgeset):
+        # if not self.check_nodes_sorted(nodeset):
+        nodeset = sorted(nodeset)
+        edgeset = self.sortEdge(edgeset)
+
         self.G.add_nodes_from(nodeset,
                          root = 0, # 0:NONROOT 1:ROOTNODE
                          type = 0, # 0:NONTARGET 1:TARGET
@@ -228,6 +232,9 @@ class Environment(object):
     def isProb(self,p):
         return p >= 0.0 and p <= 1.0
 
+    def check_nodes_sorted(self,list):
+        return all(list[i]<list[i+1] for i in range(len(list)-1))
+
     def sortEdge(self,edgeset):
         sorted_by_first_second = sorted(edgeset, key=lambda tup: (tup[0], tup[1]))
         return sorted_by_first_second
@@ -243,15 +250,15 @@ class Environment(object):
     # Node Operations
     # Get Info
     def isOrType_N(self,id):
-        return self.G.nodes[id]['type'] == 0
+        return self.G.nodes[id]['eType'] == 0
 
     def getState_N(self,id):
         return self.G.nodes[id]['state']
 
-    def getType_N(self,id):
+    def getType_N(self,id): # Target or NonTarget
         return self.G.nodes[id]['type']
 
-    def getActivationType_N(self,id):
+    def getActivationType_N(self,id): # AND or OR
         return self.G.nodes[id]['eType']
 
     def getAReward_N(self,id):
@@ -276,15 +283,13 @@ class Environment(object):
         return self.G.nodes[id]['posInactiveProb']
 
     # Set Info
+    # id is the node number rather than the index.
 
     def setRoot_N(self, id, value):
-        try:
-            if value != 0 and value != 1:
-                raise Exception("Node root value must be 0 (NONROOT) or 1 (ROOT).")
-            else:
-                self.G.nodes[id]['root'] = value
-        except Exception as error:
-            print(repr(error))
+        if value != 0 and value != 1:
+            raise ValueError("Node root value must be 0 (NONROOT) or 1 (ROOT).")
+        else:
+            self.G.nodes[id]['root'] = value
 
     def setState_N(self,id,value):
         try:
@@ -381,7 +386,7 @@ class Environment(object):
     def getid_E(self,edge):
         return self.G.edges[edge]['eid']
 
-    def getType_E(self,edge):
+    def getType_E(self,edge): # 0:NORMAL 1:VIRTUAL
         return self.G.edges[edge]['type']
 
     def getACost_E(self,edge):
@@ -521,8 +526,8 @@ class Environment(object):
     #return a list of indicator of whether node is activated.
     def get_att_isActive(self):
         isActive = []
-        for id in np.arange(self.getNumNodes()):
-            if self.G.nodes[id+1]['state'] == 1:
+        for id in self.G.nodes:
+            if self.G.nodes[id]['state'] == 1:
                 isActive.append(1)
             else:
                 isActive.append(0)
@@ -554,8 +559,9 @@ class Environment(object):
         actionspace = sorted(list(andnodes)) + oregdes + ['pass']
         return actionspace
 
+    #TODO: replace all range(num_nodes) to G.nodes since nodes may not be continuous.
     def get_def_actionspace(self):
-        actionspace = [i+1 for i in range(self.numNodes)] + ['pass']
+        actionspace = list(self.G.nodes) + ['pass']
         return actionspace
 
     # step function while action set building
@@ -646,7 +652,7 @@ class Environment(object):
 
     # Environment step function
     def step(self, action):
-        index = action - 1 #TODO: make sure action starting from 0 or 1.
+        index = action #TODO: make sure action starting from 0 or 1.
         if self.training_flag == 0: #defender is training.
             if self.actionspace_def[index] == 'pass':
                 self.current_time += 1

@@ -23,7 +23,7 @@ class Defender(object):
             if not isinstance(x,int):
                 raise ValueError("The chosen action is not an integer.")
             action_space = self.get_def_actionspace(G)
-            action = action_space[x-1] #TODO: make sure whether x starting from 0 or 1.
+            action = action_space[x] #TODO: make sure whether x starting from 0 or 1.
             if action == 'pass':
                 break
             isDup = (action in self.defact)
@@ -59,8 +59,7 @@ class Defender(object):
         return indef
 
     def get_def_actionspace(self, G):
-        num_nodes = G.number_of_nodes()
-        actionspace = [i+1 for i in range(num_nodes)] + ['pass']
+        actionspace = list(G.nodes) + ['pass']
         return actionspace
 
     def uniform_strategy(self, G):
