@@ -1,19 +1,18 @@
-import numpy as np
-import networkx as nx
-import random
-import itertools
-import time
-import training
-import tensorflow as tf
-from mpi4py import MPI
+# import numpy as np
+# import networkx as nx
+# import random
+# import itertools
+# import time
+# import training
+# import tensorflow as tf
 
-G = nx.DiGraph()
-
-G.add_edges_from([(1,2),(2,3),(3,4),(2,5),(5,6),(4,6)])
-
-a = []
-
-a += G.in_edges(2)
+# G = nx.DiGraph()
+#
+# G.add_edges_from([(1,2),(2,3),(3,4),(2,5),(5,6),(4,6)])
+#
+# a = []
+#
+# a += G.in_edges(2)
 
 # print(a)
 # print(G.number_of_nodes())
@@ -50,6 +49,16 @@ a += G.in_edges(2)
 # a[1].add_node(10)
 # print(a[1].nodes)
 
-random_actions = tf.random_uniform([10], minval=0, maxval=5, dtype=tf.int64)
-sess = tf.Session()
-print(sess.run(random_actions))
+# random_actions = tf.random_uniform([10], minval=0, maxval=5, dtype=tf.int64)
+# sess = tf.Session()
+# print(sess.run(random_actions))
+
+print("fasdf")
+
+
+
+
+
+
+
+

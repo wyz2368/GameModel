@@ -33,9 +33,13 @@ class Attacker(object):
     # This function can also be used as masking illegal actions.
     def get_att_canAttack(self, G):
         canAttack = []
+        #TODO: recheck the logics
         for andnode in self.ANDnodes:
-            if G.nodes[andnode]['root'] == 1:
+            if G.nodes[andnode]['root'] == 1 and G.nodes[andnode]['state'] == 0:
                 canAttack.append(1)
+                continue
+            if G.nodes[andnode]['root'] == 1 and G.nodes[andnode]['state'] == 1:
+                canAttack.append(0)
                 continue
             precondflag = 1
             precond = G.predecessors(andnode)
@@ -66,8 +70,11 @@ class Attacker(object):
             else:
                 inAttackSet.append(0)
 
-            if G.nodes[andnode]['root'] == 1:
+            if G.nodes[andnode]['root'] == 1 and G.nodes[andnode]['state'] == 0:
                 canAttack.append(1)
+                continue
+            if G.nodes[andnode]['root'] == 1 and G.nodes[andnode]['state'] == 1:
+                canAttack.append(0)
                 continue
             precondflag = 1
             precond = G.predecessors(andnode)

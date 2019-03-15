@@ -1,4 +1,5 @@
 import DagGenerator as dag
+import numpy as np
 
 env = dag.Environment(numNodes=5, numEdges=4, numRoot=2, numGoals=1)
 
@@ -135,8 +136,31 @@ env.create_players()
 # a = [1,2,3]
 # print(env.check_nodes_sorted(a))
 
-# test step functions
 
+# test mask
+def mask_generator_att(env, obses):
+    batch_size = np.shape(obses)[0]
+    num_nodes = env.G.number_of_nodes()
+    mask = []
+    for i in np.arange(batch_size):
+        state = obses[i][:num_nodes]
+        G_cur = env.G_reserved.copy()
+
+        for j in G_cur.nodes:
+            G_cur.nodes[j]['state'] = state[j-1]
+            print("nodestate:", G_cur.nodes[j]['state'])
+            print(state[j-1])
+
+        _mask = env.attacker.get_att_canAttack(G_cur)
+        print(_mask)
+        mask.append(_mask)
+        break
+    return np.array(mask)
+
+obses = np.array([[1,0,0,0,0],[0,0,0,0,1],[1,0,0,0,1]])
+
+mask = mask_generator_att(env, obses)
+print(mask)
 
 
 
