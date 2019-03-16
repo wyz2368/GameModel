@@ -2,7 +2,7 @@ import networkx as nx
 import numpy as np
 import sys
 import random
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import attacker
 import defender
 
@@ -70,8 +70,9 @@ class Environment(object):
                          cost = 0, # Cost for attacker on OR node, GREATER THAN OR EQUAL TO 0
                          actProb=1.0) # probability of successfully activating, for OR node only
 
-    #TODO: root node must be AND node.
-    def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100):
+    # TODO: root node must be AND node.
+    def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100,
+                  EminWeight=0, EmaxWeight=100):
         # Exception handling
         # try:
         #     if self.numRoot + self.numGoals > self.numNodes:
@@ -82,8 +83,9 @@ class Environment(object):
         try:
             maxEdges = (self.numNodes - 1) * (self.numNodes) / 2
             if self.numEdges > maxEdges:
-                raise Exception("For a graph with " + str(self.numNodes) + " nodes, there can be a maximum of " + str(
-                    int(maxEdges)) + " edges.")
+                raise Exception(
+                    "For a graph with " + str(self.numNodes) + " nodes, there can be a maximum of " + str(
+                        int(maxEdges)) + " edges.")
         except Exception as error:
             print(repr(error))
             return 1
@@ -117,13 +119,14 @@ class Environment(object):
             if len(self.G.pred[nodeID]) == 0:
                 self.setRoot_N(nodeID, 1)
                 self.setType_N(nodeID, 0)  # Root nodes cannot be target (goal) nodes.
+                self.setActivationType_N(nodeID, 1)  # Root nodes must be AND nodes
             else:
                 self.setRoot_N(nodeID, 0)
                 if nodeID in goalNodes:  # Set Goal nodes
                     self.setType_N(nodeID, 1)
                 else:
                     self.setType_N(nodeID, 0)
-            self.setActivationType_N(nodeID, np.random.randint(2))
+                self.setActivationType_N(nodeID, np.random.randint(2))
             self.setState_N(nodeID, np.random.randint(2))
             self.setAReward_N(nodeID, np.random.uniform(0, NmaxAReward))
             self.setDPenalty_N(nodeID, np.random.uniform(0, NmaxDPenalty))
@@ -176,58 +179,58 @@ class Environment(object):
     # Node did not visualize: aReward, dPenalty, dCost, aCost, posActiveProb, posInactiveProb, actProb, topoPosition
     # Edge did not visualize: eid, cost, weight, actProb
     #TODO:Does not work
-    def visualize(self):
-        nodePos = nx.layout.spring_layout(self.G)
-        # Local variable initialization
-        try:  # rootNodes and targetNodes cannot overlap
-            rootNodes = self.get_Roots()[1]
-            targetNodes = self.get_Targets()[1]
-            if bool(set(rootNodes) & set(targetNodes)):
-                raise Exception("Goal and Root nodes overlap. A Goal node cannot be a Root node, and vice versa.")
-        except Exception as error:
-            print(repr(error))
-            return 1
-        virtualEdges = [edge for edge in self.G.edges if self.getType_E(edge) == 1]
-
-        # Visualization format: Nodes
-        #    Active = Green, Inactive = Red
-        #    nonGoal AND Node = ^ Triangle
-        #    Goal AND Node = p Pentagon
-        #    nonGoal OR Node = o Circle
-        #    Goal OR Node = h Hexagon
-        #	 ROOT nodes = Bold Labels
-        #	 nonROOT nodes = Regular Labels
-        nodeSize = 300
-        for node in self.G.nodes:
-            if self.getState_N(node) == 1:
-                nodeColor = 'g'  # Active = Green
-            else:
-                nodeColor = 'r'  # Inactive = Red
-            if self.getActivationType_N(node) == 1:
-                if node in targetNodes:
-                    nodeShape = 'p'  # Goal AND Node = p Pentagon
-                else:
-                    nodeShape = '^'  # nonGoal AND Node = ^ Triangle
-            else:
-                if node in targetNodes:
-                    nodeShape = 'h'  # Goal OR Node = h Hexagon
-                else:
-                    nodeShape = 'o'  # nonGoal OR Node = o Circle
-            nx.draw_networkx_nodes(self.G, nodePos, node_shape=nodeShape, nodelist=[node], node_size=nodeSize,
-                                   node_color=nodeColor, vmax=0.1)
-        nx.draw_networkx_labels(self.G, nodePos, labels={k: k for k in rootNodes},
-                                font_weight='bold')  # ROOT nodes = Bold Labels
-        nx.draw_networkx_labels(self.G, nodePos, labels={k: k for k in list(
-            set(self.G.nodes) - set(rootNodes))})  # nonROOT nodes = Regular Labels
-
-        # Visualization format: Edges
-        # 	Virtual edges = Blue
-        # 	Normal edges = Black
-        nx.draw_networkx_edges(self.G, nodePos, edgelist=virtualEdges, edge_color='blue')  # Virtual edges = Blue
-        nx.draw_networkx_edges(self.G, nodePos,
-                               edgelist=list(set(self.G.edges) - set(virtualEdges)))  # Normal edges = Black
-
-        plt.show()
+    # def visualize(self):
+    #     nodePos = nx.layout.spring_layout(self.G)
+    #     # Local variable initialization
+    #     try:  # rootNodes and targetNodes cannot overlap
+    #         rootNodes = self.get_Roots()[1]
+    #         targetNodes = self.get_Targets()[1]
+    #         if bool(set(rootNodes) & set(targetNodes)):
+    #             raise Exception("Goal and Root nodes overlap. A Goal node cannot be a Root node, and vice versa.")
+    #     except Exception as error:
+    #         print(repr(error))
+    #         return 1
+    #     virtualEdges = [edge for edge in self.G.edges if self.getType_E(edge) == 1]
+    #
+    #     # Visualization format: Nodes
+    #     #    Active = Green, Inactive = Red
+    #     #    nonGoal AND Node = ^ Triangle
+    #     #    Goal AND Node = p Pentagon
+    #     #    nonGoal OR Node = o Circle
+    #     #    Goal OR Node = h Hexagon
+    #     #	 ROOT nodes = Bold Labels
+    #     #	 nonROOT nodes = Regular Labels
+    #     nodeSize = 300
+    #     for node in self.G.nodes:
+    #         if self.getState_N(node) == 1:
+    #             nodeColor = 'g'  # Active = Green
+    #         else:
+    #             nodeColor = 'r'  # Inactive = Red
+    #         if self.getActivationType_N(node) == 1:
+    #             if node in targetNodes:
+    #                 nodeShape = 'p'  # Goal AND Node = p Pentagon
+    #             else:
+    #                 nodeShape = '^'  # nonGoal AND Node = ^ Triangle
+    #         else:
+    #             if node in targetNodes:
+    #                 nodeShape = 'h'  # Goal OR Node = h Hexagon
+    #             else:
+    #                 nodeShape = 'o'  # nonGoal OR Node = o Circle
+    #         nx.draw_networkx_nodes(self.G, nodePos, node_shape=nodeShape, nodelist=[node], node_size=nodeSize,
+    #                                node_color=nodeColor, vmax=0.1)
+    #     nx.draw_networkx_labels(self.G, nodePos, labels={k: k for k in rootNodes},
+    #                             font_weight='bold')  # ROOT nodes = Bold Labels
+    #     nx.draw_networkx_labels(self.G, nodePos, labels={k: k for k in list(
+    #         set(self.G.nodes) - set(rootNodes))})  # nonROOT nodes = Regular Labels
+    #
+    #     # Visualization format: Edges
+    #     # 	Virtual edges = Blue
+    #     # 	Normal edges = Black
+    #     nx.draw_networkx_edges(self.G, nodePos, edgelist=virtualEdges, edge_color='blue')  # Virtual edges = Blue
+    #     nx.draw_networkx_edges(self.G, nodePos,
+    #                            edgelist=list(set(self.G.edges) - set(virtualEdges)))  # Normal edges = Black
+    #
+    #     plt.show()
 
     def isProb(self,p):
         return p >= 0.0 and p <= 1.0

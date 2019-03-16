@@ -119,3 +119,34 @@ class Attacker(object):
 
     def set_current_strategy(self,strategy):
         self.nn_att = strategy
+
+
+    # Designed for mask function
+    def get_att_canAttack_mask(self, G):
+        canAttack = []
+        #TODO: recheck the logics
+        for andnode in self.ANDnodes:
+            if G.nodes[andnode]['root'] == 1 and G.nodes[andnode]['state'] == 0:
+                canAttack.append(0)
+                continue
+            if G.nodes[andnode]['root'] == 1 and G.nodes[andnode]['state'] == 1:
+                canAttack.append(-100)
+                continue
+            precondflag = 1
+            precond = G.predecessors(andnode)
+            for prenode in precond:
+                if G.nodes[prenode]['state'] == 0:
+                    precondflag = 0
+                    break
+            if G.nodes[andnode]['state'] == 0 and precondflag:
+                canAttack.append(0)
+            else:
+                canAttack.append(-100)
+
+        for (father, son) in self.ORedges:
+            if G.nodes[father]['state'] == 1 and G.nodes[son]['state'] == 0:
+                canAttack.append(0)
+            else:
+                canAttack.append(-100)
+
+        return canAttack

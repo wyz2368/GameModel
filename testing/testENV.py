@@ -148,13 +148,10 @@ def mask_generator_att(env, obses):
 
         for j in G_cur.nodes:
             G_cur.nodes[j]['state'] = state[j-1]
-            print("nodestate:", G_cur.nodes[j]['state'])
-            print(state[j-1])
 
-        _mask = env.attacker.get_att_canAttack(G_cur)
-        print(_mask)
+        _mask = env.attacker.get_att_canAttack_mask(G_cur)
+
         mask.append(_mask)
-        break
     return np.array(mask)
 
 obses = np.array([[1,0,0,0,0],[0,0,0,0,1],[1,0,0,0,1]])
