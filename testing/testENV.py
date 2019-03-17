@@ -1,5 +1,8 @@
 import DagGenerator as dag
+import random
 import numpy as np
+import time
+import rand_strategies_payoff as rp
 
 env = dag.Environment(numNodes=5, numEdges=4, numRoot=2, numGoals=1)
 
@@ -138,33 +141,46 @@ env.create_players()
 
 
 # test mask
-def mask_generator_att(env, obses):
-    batch_size = np.shape(obses)[0]
-    num_nodes = env.G.number_of_nodes()
-    mask = []
-    for i in np.arange(batch_size):
-        state = obses[i][:num_nodes]
-        G_cur = env.G_reserved.copy()
+# def mask_generator_att(env, obses):
+#     batch_size = np.shape(obses)[0]
+#     num_nodes = env.G.number_of_nodes()
+#     mask = []
+#     for i in np.arange(batch_size):
+#         state = obses[i][:num_nodes]
+#         G_cur = env.G_reserved.copy()
+#
+#         for j in G_cur.nodes:
+#             G_cur.nodes[j]['state'] = state[j-1]
+#
+#         _mask = env.attacker.get_att_canAttack_mask(G_cur)
+#
+#         mask.append(_mask)
+#     return np.array(mask)
+#
+# obses = np.array([[1,0,0,0,0],[0,0,0,0,1],[1,0,0,0,1]])
+#
+# mask = mask_generator_att(env, obses)
+# print(mask)
 
-        for j in G_cur.nodes:
-            G_cur.nodes[j]['state'] = state[j-1]
+# Test sim using random strategies
 
-        _mask = env.attacker.get_att_canAttack_mask(G_cur)
+t1 = time.time()
+# payoff_att, payoff_def, ta, tb, tc = rp.parallel_sim(env,1000)
+a ,b = rp.parallel_sim(env,400)
+t2 = time.time()
 
-        mask.append(_mask)
-    return np.array(mask)
+t3 = time.time()
+payoff_att, payoff_def, tz, tx = rp.rand_strategies_payoff(env,400)
+t4 = time.time()
 
-obses = np.array([[1,0,0,0,0],[0,0,0,0,1],[1,0,0,0,1]])
+# print(payoff_def,payoff_att)
 
-mask = mask_generator_att(env, obses)
-print(mask)
+# print(t2-t1,t4-t3, ta, tb, tc)
 
+# print(tz,tx)
 
-
-
-
-
-
+print(t2-t1,t4-t3)
+print(a, b)
 
 
 

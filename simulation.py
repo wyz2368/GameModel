@@ -45,4 +45,4 @@ def simulation(env, attacker, nn_att, defender, nn_def, num_episodes):
 
     return np.mean(aReward_list), np.mean(dReward_list)
 
-# def simulation_all(att_str_list, def_str_list):
+

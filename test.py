@@ -1,10 +1,10 @@
-# import numpy as np
-# import networkx as nx
-# import random
-# import itertools
-# import time
-# import training
-# import tensorflow as tf
+import numpy as np
+import networkx as nx
+import random
+import itertools
+import time
+import training
+import tensorflow as tf
 
 # G = nx.DiGraph()
 #
@@ -53,9 +53,9 @@
 # sess = tf.Session()
 # print(sess.run(random_actions))
 
-print("fasdf")
+a = [1,2,3,(1,2)]
 
-
+print(random.sample(a,2))
 
 
 

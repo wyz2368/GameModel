@@ -104,7 +104,7 @@ class Attacker(object):
         actmask = self.get_att_canAttack(G)
         attSet = list(self.ANDnodes) + self.ORedges
         actset_masked = list(x for x, z in zip(attSet, actmask) if z)
-        return set(sorted(random.sample(actset_masked,rand_limit)))
+        return set(random.sample(actset_masked,min(rand_limit, len(actset_masked))))
 
     def update_obs(self, obs):
         self.observation = obs
