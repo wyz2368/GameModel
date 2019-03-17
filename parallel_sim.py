@@ -7,21 +7,20 @@ import time
 #TODO: create different copy of env.
 
 def parallel_sim(env, nn_att_list, nn_def_list, num_episodes):
-    aReward_list = np.array([])
-    dReward_list = np.array([])
     G_list, att_list, def_list = copy_env(env, num_episodes)
+    arg = list(zip(G_list,att_list,nn_att_list,def_list,nn_def_list,[env.T]*num_episodes))
     with mp.Pool() as pool:
-        for i in np.arange(num_episodes):
-            r = pool.apply_async(single_sim,(G_list[i],att_list[i],nn_att_list[i],def_list[i],nn_def_list[i],env.T))
-            aReward_list = np.append(aReward_list,r.get()[0])
-            dReward_list = np.append(dReward_list,r.get()[1])
-    return np.mean(aReward_list), np.mean(dReward_list)
+        r = pool.map_async(single_sim, arg)
+        a =r.get()
+    return np.sum(np.array(a),0)/num_episodes
 
 
-def single_sim(G, attacker, nn_att, defender, nn_def, T): #single for single episode.
+def single_sim(param): #single for single episode.
     # TODO: APIs have been changed.
     aReward = 0
     dReward = 0
+
+    G, attacker, nn_att, defender, nn_def, T = param
 
     for t in range(T):
         timeleft = T - t

@@ -9,7 +9,7 @@ import defender
 class Environment(object):
     #TODO: all representations are logically sorted.！！！！
     #TODO: use random label. Move random label to simulation.
-    def __init__(self, num_attr_N = 11, num_attr_E = 4, T=10, graphid=1, numNodes=20, numEdges=10, numRoot=3, numGoals=3, history = 3):
+    def __init__(self, num_attr_N = 11, num_attr_E = 4, T=100, graphid=1, numNodes=20, numEdges=10, numRoot=3, numGoals=3, history = 3):
         self.num_attr_N = num_attr_N
         self.num_attr_E = num_attr_E
         self.T = T

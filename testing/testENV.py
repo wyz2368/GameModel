@@ -166,11 +166,11 @@ env.create_players()
 
 t1 = time.time()
 # payoff_att, payoff_def, ta, tb, tc = rp.parallel_sim(env,1000)
-a ,b = rp.parallel_sim(env,400)
+a,b  = rp.parallel_sim(env,1000)
 t2 = time.time()
 
 t3 = time.time()
-payoff_att, payoff_def, tz, tx = rp.rand_strategies_payoff(env,400)
+payoff_att, payoff_def, tz, tx = rp.rand_strategies_payoff(env,1000)
 t4 = time.time()
 
 # print(payoff_def,payoff_att)
@@ -180,10 +180,7 @@ t4 = time.time()
 # print(tz,tx)
 
 print(t2-t1,t4-t3)
-print(a, b)
-
-
-
+# print(a,b)
 
 
 

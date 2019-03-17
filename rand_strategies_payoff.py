@@ -3,6 +3,7 @@ import numpy as np
 import multiprocessing as mp
 import copy
 import time
+import operator
 
 def rand_strategies_payoff(env, num_episodes):
     aReward_list = np.array([])
@@ -48,42 +49,38 @@ def rand_strategies_payoff(env, num_episodes):
     t2 = time.time()
     return np.mean(aReward_list), np.mean(dReward_list), t2-t1, sum(tl)
 
-def parallel_sim(env,  num_episodes):
-    aReward_list = []#np.array([])
-    dReward_list = []#np.array([])
-
-    G_list, att_list = copy_env(env, num_episodes)
-
-    with mp.Pool() as pool:
-        for i in np.arange(num_episodes):
-            r = pool.apply_async(rand_single_sim_parallel,(G_list[i], att_list[i], env.T))
-            aReward_list = np.append(aReward_list,r.get()[0])
-            dReward_list = np.append(dReward_list,r.get()[1])
-
-    return np.mean(aReward_list), np.mean(dReward_list)
-
 
 # def parallel_sim(env,  num_episodes):
-#     # G_list, att_list = copy_env(env, num_episodes)
-#     t1 = time.time()
-#     arg = []
-#     for i in range(num_episodes):
-#         arg.append(copy.deepcopy(env))
-#     t2 = time.time()
+#     aReward_list = np.array([])
+#     dReward_list = np.array([])
+#
+#     G_list, att_list = copy_env(env, num_episodes)
 #
 #     with mp.Pool() as pool:
-#         r = pool.map_async(rand_single_sim_parallel,arg)
+#         for i in np.arange(num_episodes):
+#             r = pool.apply_async(rand_single_sim_parallel,(G_list[i], att_list[i], env.T))
+#             aReward_list = np.append(aReward_list,r.get()[0])
+#             dReward_list = np.append(dReward_list,r.get()[1])
 #
-#     # result = np.array(list(map(sum,r.get())))/num_episodes
-#         a = r.get()
-#     return a, t2-t1
+#     return np.mean(aReward_list), np.mean(dReward_list)
 
 
-def rand_single_sim_parallel(G, attacker, T):
-# def rand_single_sim_parallel(env):
+def parallel_sim(env,  num_episodes):
+    G_list, att_list = copy_env(env, num_episodes)
+
+    arg = list(zip(G_list, att_list, [env.T]*num_episodes))
+
+
+    with mp.Pool() as pool:
+        r = pool.map_async(rand_single_sim_parallel,arg)
+        a = r.get()
+    return np.sum(np.array(a),0)/num_episodes
+
+# def rand_single_sim_parallel(G, attacker, T):
+def rand_single_sim_parallel(param):
     num_resource_def = 2
     num_resource_att = 2
-
+    G, attacker, T = param
     # G = env.G
     # attacker = env.attacker
     # T = env.T
@@ -114,6 +111,7 @@ def rand_single_sim_parallel(G, attacker, T):
             if G.nodes[node]['state'] == 1:
                 aReward += G.nodes[node]['aReward']
                 dReward += G.nodes[node]['dPenalty']
+
 
     return aReward, dReward
 
