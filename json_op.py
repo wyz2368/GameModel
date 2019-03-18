@@ -1,7 +1,7 @@
 import json
 import file_op as fp
 
-DIR_json = './json_dir/'
+DIR_json = './attackgraph/json_dir/'
 
 def load_json_data(json_file):
     '''

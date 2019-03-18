@@ -1,6 +1,5 @@
-import multiprocessing as mp
-import time
 import subprocess
+import time
 
 def call_and_wait_with_timeout(command_str):
     print("Will run:\n" + command_str)
@@ -14,5 +13,11 @@ def call_and_wait_with_timeout(command_str):
     time.sleep(sleep_sec)
     my_process.kill()
 
+def call_and_wait(command_str):
+    print("Will run:\n" + command_str)
+    my_process = subprocess.Popen(command_str, shell=True)
+    my_process.wait()
+    sleep_sec = 5
+    time.sleep(sleep_sec)
+    my_process.kill()
 
-command_str = "python "

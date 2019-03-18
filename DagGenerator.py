@@ -71,43 +71,35 @@ class Environment(object):
                          actProb=1.0) # probability of successfully activating, for OR node only
 
     # TODO: root node must be AND node.
-    def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100,
-                  EminWeight=0, EmaxWeight=100):
+    def randomDAG(self, NmaxAReward=100, NmaxDPenalty=100, NmaxDCost=100, NmaxACost=100, EmaxACost=100, EminWeight=0, EmaxWeight=100):
         # Exception handling
-        # try:
-        #     if self.numRoot + self.numGoals > self.numNodes:
-        #         raise Exception("(Number of root nodes) + (Number of goal nodes) cannot exceed total number of nodes.")
-        # except Exception as error:
-        #     print(repr(error))
-        #     return 1
         try:
-            maxEdges = (self.numNodes - 1) * (self.numNodes) / 2
+            if self.numRoot + self.numGoals > self.numNodes:
+                raise Exception("(Number of root nodes) + (Number of goal nodes) cannot exceed total number of nodes.")
+        except Exception as error:
+            print(repr(error))
+            return 1
+        try:
+            maxEdges = (self.numNodes-1)*(self.numNodes)/2
             if self.numEdges > maxEdges:
-                raise Exception(
-                    "For a graph with " + str(self.numNodes) + " nodes, there can be a maximum of " + str(
-                        int(maxEdges)) + " edges.")
+                raise Exception("For a graph with " + str(self.numNodes) + " nodes, there can be a maximum of " + str(int(maxEdges)) + " edges.")
         except Exception as error:
             print(repr(error))
             return 1
 
-        self.G = nx.gnp_random_graph(self.numNodes, 1,
-                                     directed=True)  # Create fully connected directed Erdos-Renyi graph.
-        self.G = nx.DiGraph([(u, v) for (u, v) in self.G.edges() if u < v], horizon=self.T,
-                            id=self.graphid)  # Drop all edges (u,v) where edge u<v to enforce acyclic graph property.
-        rootNodes = random.sample(range(1, self.numNodes - 1),
-                                  self.numRoot - 1)  # Given the parameter self.numRoot, pick self.numRoot-1 random root IDs.
-        # Node 0 will also always be root. Last node (ID:self.numNodes) cannot be root node.
-        goalNodes = random.sample(list(set(range(1, self.numNodes)) - set(rootNodes)),
-                                  self.numGoals)  # Randomly pick GoalNodes
+        self.G = nx.gnp_random_graph(self.numNodes, 1, directed=True) # Create fully connected directed Erdos-Renyi graph.
+        self.G = nx.DiGraph([(u,v) for (u,v) in self.G.edges() if u<v], horizon = self.T, id = self.graphid) # Drop all edges (u,v) where edge u<v to enforce acyclic graph property.
+        rootNodes = random.sample(range(1,self.numNodes-1),self.numRoot-1) # Given the parameter self.numRoot, pick self.numRoot-1 random root IDs.
+                                                                 # Node 0 will also always be root. Last node (ID:self.numNodes) cannot be root node.
+        goalNodes = random.sample(list(set(range(1,self.numNodes))-set(rootNodes)),self.numGoals) # Randomly pick GoalNodes
 
-        for rootNode in rootNodes:  # Out of the picked rootNodes, drop all edges (u,v) where v = rootNode.
+        for rootNode in rootNodes: # Out of the picked rootNodes, drop all edges (u,v) where v = rootNode.
             for start in range(0, rootNode):
                 self.G.remove_edge(start, rootNode)
         canRemove = list(self.G.edges)
-        while len(self.G.edges) > self.numEdges and len(
-                canRemove) != 0:  # Randomly delete edges until self.numEdges is met, or if there are no more nodes to remove.
-            # canRemove = nodes not yet removed OR nodes that once removed do not
-            # break the connected property.
+        while len(self.G.edges) > self.numEdges and len(canRemove) != 0: # Randomly delete edges until self.numEdges is met, or if there are no more nodes to remove.
+                                                                    # canRemove = nodes not yet removed OR nodes that once removed do not
+                                                                    # break the connected property.
             deleteEdge = random.choice(canRemove)
             self.G.remove_edge(deleteEdge[0], deleteEdge[1])
             if (not nx.is_connected(self.G.to_undirected())) or (len(self.G.pred[deleteEdge[1]]) == 0):
@@ -118,60 +110,37 @@ class Environment(object):
         for nodeID in range(self.numNodes):
             if len(self.G.pred[nodeID]) == 0:
                 self.setRoot_N(nodeID, 1)
-                self.setType_N(nodeID, 0)  # Root nodes cannot be target (goal) nodes.
-                self.setActivationType_N(nodeID, 1)  # Root nodes must be AND nodes
+                self.setType_N(nodeID, 0) # Root nodes cannot be target (goal) nodes.
+                self.setActivationType_N(nodeID, 1) # Root nodes must be AND nodes
             else:
                 self.setRoot_N(nodeID, 0)
-                if nodeID in goalNodes:  # Set Goal nodes
+                if nodeID in goalNodes: # Set Goal nodes
                     self.setType_N(nodeID, 1)
                 else:
                     self.setType_N(nodeID, 0)
                 self.setActivationType_N(nodeID, np.random.randint(2))
             self.setState_N(nodeID, np.random.randint(2))
             self.setAReward_N(nodeID, np.random.uniform(0, NmaxAReward))
-            self.setDPenalty_N(nodeID, np.random.uniform(0, NmaxDPenalty))
-            self.setDCost_N(nodeID, np.random.uniform(0, NmaxDCost))
-            self.setACost_N(nodeID, np.random.uniform(0, NmaxACost))
+            self.setDPenalty_N(nodeID, -np.random.uniform(0, NmaxDPenalty))
+            self.setDCost_N(nodeID, -np.random.uniform(0, NmaxDCost))
+            self.setACost_N(nodeID, -np.random.uniform(0, NmaxACost))
             self.setposActiveProb_N(nodeID, np.random.uniform(0, 1))
             self.setposInactiveProb_N(nodeID, np.random.uniform(0, 1))
+        # Nodes must start with id = 1
+        self.G = nx.relabel_nodes(self.G, dict(zip(self.G.nodes, list(np.asarray(list(self.G.nodes)) + 1))))
+        # This messes with the ordering of the edges; fix is below:
+        sortedEdges = list(sorted(self.G.edges))
+        for edge in sortedEdges:
+            self.G.remove_edge(edge[0], edge[1])
+        for edge in sortedEdges:
+            self.G.add_edge(edge[0], edge[1])
 
         # Set random edge attributes
         for edgeID, edge in enumerate(self.G.edges):
             self.setid_E(edge, edgeID)
             self.setType_E(edge, np.random.randint(2))
-            self.setACost_E(edge, np.random.uniform(0, EmaxACost))
+            self.setACost_E(edge, -np.random.uniform(0, EmaxACost))
             self.setActProb_E(edge, np.random.uniform(0, 1))
-
-    # Parameter Format:
-    #    AttributesDict: Dictionary of the following attributes:
-    #	 Nodes = List of N integers, representing Node IDs.
-    #    Edges = List of E Tuples, representing Edges.
-    #    Nroots, Ntypes, NeTypes, Nstates, NaRewards, NdPenalties, NdCosts, NaCosts, NposActiveProbs, NposInacriveProbs, NtopoPositions:
-    #    Size N list. Each List[x] attribute correspondes to the node in position nodes[x].
-
-    # TODO: remove the first line. Check if G has been initialized.
-    def specifiedDAG(self, attributesDict):
-        # self.daggenerator_wo_attrs(attributesDict['nodes'], attributesDict['edges'])
-        for nodeID in attributesDict['nodes']:
-            self.setRoot_N(nodeID, attributesDict['Nroots'][nodeID-1])
-            self.setType_N(nodeID, attributesDict['Ntypes'][nodeID-1])
-            self.setActivationType_N(nodeID, attributesDict['NeTypes'][nodeID-1])
-            self.setState_N(nodeID, attributesDict['Nstates'][nodeID-1])
-            self.setAReward_N(nodeID, attributesDict['NaRewards'][nodeID-1])
-            self.setDPenalty_N(nodeID, attributesDict['NdPenalties'][nodeID-1])
-            self.setDCost_N(nodeID, attributesDict['NdCosts'][nodeID-1])
-            self.setACost_N(nodeID, attributesDict['NaCosts'][nodeID-1])
-            self.setposActiveProb_N(nodeID, attributesDict['NposActiveProbs'][nodeID-1])
-            self.setposInactiveProb_N(nodeID, attributesDict['NposInactiveProbs'][nodeID-1])
-            self.setActProb_N(nodeID,attributesDict['NactProbs'][nodeID-1])
-
-        idx = 0
-        for edge in attributesDict['edges']:
-            self.setid_E(edge, attributesDict['Eeids'][idx])
-            self.setType_E(edge, attributesDict['Etypes'][idx])
-            self.setACost_E(edge, attributesDict['Ecosts'][idx])
-            self.setActProb_E(edge, attributesDict['actProb'][idx])
-            idx += 1
 
 
 

@@ -1,10 +1,11 @@
 import numpy as np
-import networkx as nx
-import random
-import itertools
-import time
-import training
-import tensorflow as tf
+# import networkx as nx
+# import random
+# import itertools
+# import time
+# import training
+# import tensorflow as tf
+import pickle as pk
 
 # G = nx.DiGraph()
 #
@@ -53,9 +54,7 @@ import tensorflow as tf
 # sess = tf.Session()
 # print(sess.run(random_actions))
 
-a = [1,2,3,(1,2)]
 
-print(random.sample(a,2))
 
 
 

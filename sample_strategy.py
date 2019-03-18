@@ -3,8 +3,8 @@ import file_op as fp
 from baselines import deepq
 from baselines.common import models
 
-DIR = './'
-
+DIR = './attackgraph/'
+#TODO: check all path correct.
 def sample_strategy_from_mixed(env, str_set, mix_str, identity):
     #TODO: Add path
     #TODO: explain opponent_str is None

@@ -9,8 +9,17 @@ class Game_data(object):
         self.nasheq = {}
         self.payoffmatrix_def = np.zeros((1,1))
         self.payoffmatrix_att = np.zeros((1,1))
-        self.dir_def = './defender_strategies/'
-        self.dir_att = './attacker_strategies/'
+        self.dir_def = './attackgraph/defender_strategies/'
+        self.dir_att = './attackgraph/attacker_strategies/'
+
+    def num_str(self):
+        return len(self.att_str), len(self.def_str)
+
+    def dim_payoff_def(self):
+        return np.shape(self.payoffmatrix_def)
+
+    def dim_payoff_att(self):
+        return np.shape(self.payoffmatrix_att)
 
     def add_att_str(self, str_name):
         # TODO: check if str_name is an attacker's strategy and if it exists.

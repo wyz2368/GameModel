@@ -65,7 +65,7 @@ def rand_strategies_payoff(env, num_episodes):
 #     return np.mean(aReward_list), np.mean(dReward_list)
 
 
-def parallel_sim(env,  num_episodes):
+def rand_parallel_sim(env,  num_episodes):
     G_list, att_list = copy_env(env, num_episodes)
 
     arg = list(zip(G_list, att_list, [env.T]*num_episodes))
