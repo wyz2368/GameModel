@@ -1,9 +1,11 @@
 import numpy as np
 import file_op as fp
+import copy
 
 class Game_data(object):
-    def __init__(self,env):
-        self.env = env
+    def __init__(self, env, num_layers, num_hidden, num_episodes):
+        #TODO: check if env should be initial env, this env should be with G_reserved.
+        self.env = copy.deepcopy(env)
         self.att_str = []
         self.def_str = []
         self.nasheq = {}
@@ -11,6 +13,16 @@ class Game_data(object):
         self.payoffmatrix_att = np.zeros((1,1))
         self.dir_def = './attackgraph/defender_strategies/'
         self.dir_att = './attackgraph/attacker_strategies/'
+
+        self.num_episodes = num_episodes
+
+        # parameters for neural network
+        self.num_layers = num_layers
+        self.num_hidden = num_hidden
+
+    def set_nn_params(self, num_layers, num_hidden):
+        self.num_layers = num_layers
+        self.num_hidden = num_hidden
 
     def num_str(self):
         return len(self.att_str), len(self.def_str)

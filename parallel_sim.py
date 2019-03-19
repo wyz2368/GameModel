@@ -5,10 +5,11 @@ import copy
 import time
 
 #TODO: create different copy of env.
-
-def parallel_sim(env, nn_att_list, nn_def_list, num_episodes):
+#TODO: fix one set of strategies.
+#TODO: check [nn]*num_episodes
+def parallel_sim(env, nn_att, nn_def, num_episodes):
     G_list, att_list, def_list = copy_env(env, num_episodes)
-    arg = list(zip(G_list,att_list,nn_att_list,def_list,nn_def_list,[env.T]*num_episodes))
+    arg = list(zip(G_list,att_list,[nn_att]*num_episodes,def_list,[nn_def]*num_episodes,[env.T]*num_episodes))
     with mp.Pool() as pool:
         r = pool.map_async(single_sim, arg)
         a =r.get()
