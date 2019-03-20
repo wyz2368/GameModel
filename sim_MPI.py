@@ -2,11 +2,10 @@ from mpi4py import MPI
 from parallel_sim import parallel_sim
 from rand_strategies_payoff import rand_parallel_sim
 from deepq import load_action
-import math
 import file_op as fp
-import pickle
 
 
+#TODO: assign epoch
 def sim_and_modifiy_MPI():
     #TODO: load game
     path = './attackgraph/data/game.pkl'
@@ -31,8 +30,6 @@ def sim_and_modifiy(game, rank, size):
 
     def_str_list = game.def_str
     att_str_list = game.att_str
-    new_str_def = def_str_list[-1]
-    new_str_att = att_str_list[-1]
     dir_def = game.dir_def
     dir_att = game.dir_att
 
@@ -55,13 +52,32 @@ def sim_and_modifiy(game, rank, size):
     else:
         num_task_per_proc = num_tasks // size
         extra_num_tasks = num_tasks % size
+        num_task_per_proc_p1 = num_task_per_proc + 1
 
-        if rank == size - 1:
-            data[] = parallel_sim()
+        #TODO: Does not finish.
+        if rank < extra_num_tasks:
+            for i in range(num_task_per_proc_p1):
+                idx_def, idx_att = position_list[rank*num_task_per_proc_p1+i]
+                str_path_def = dir_def + def_str_list[idx_def]
+                str_path_att = dir_att + att_str_list[idx_att]
+                nn_def = load_action(str_path_def, game)
+                nn_att = load_action(str_path_att, game)
+                data[position_list[rank*num_task_per_proc_p1+i]] = parallel_sim(env,nn_att, nn_def, num_episodes)
         else:
-            data[] = parallel_sim()
+            for i in range(num_task_per_proc):
+                idx_def, idx_att = position_list[rank*num_task_per_proc+1]
+                str_path_def = dir_def + def_str_list[idx_def]
+                str_path_att = dir_att + att_str_list[idx_att]
+                nn_def = load_action(str_path_def, game)
+                nn_att = load_action(str_path_att, game)
+                data[position_list[rank*num_task_per_proc+1]] = parallel_sim(env,nn_att, nn_def, num_episodes)
 
     return data
+
+
+
+
+
 
 
 

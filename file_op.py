@@ -28,7 +28,7 @@ def rmfile(path):
     else:
         raise ValueError(path + "does not exist.")
 
-def isExist(path):
+def isExist(path): #TODO: check if this means dir exists or file exists.
     return os.path.exists(path)
 
 def isInName(str,name):

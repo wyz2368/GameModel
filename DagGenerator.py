@@ -14,6 +14,7 @@ class Environment(object):
         self.num_attr_E = num_attr_E
         self.T = T
         self.current_time = 0
+        self.epoch = 0
         self.graphid = graphid
         self.G = nx.DiGraph(horizon = T, id = graphid)
         self.history = history
