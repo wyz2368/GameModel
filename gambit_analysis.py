@@ -47,11 +47,6 @@ def decode_gambit_file():
 
 	nash = nash[3:]
 	nash = nash.split(',')
-	# print(nash)
-	# nash= np.fromstring(nash, dtype=np.float, sep=',')
-	# print(nash)
-	# nash = np.round(nash,decimals=2)
-	# print(nash)
 	new_nash = []
 	for i in range(len(nash)):
 		new_nash.append(convert(nash[i]))
@@ -76,3 +71,36 @@ def convert(s):
 	except ValueError:
 		num, denom = s.split('/')
 		return float(num) / float(denom)
+
+# ne is a dic。 nash is a numpy. 0: def, 1: att
+def add_new_NE(game, nash_att, nash_def, epoch):
+	ne = {}
+	ne[0] = nash_def
+	ne[1] = nash_att
+	game.add_nasheq(epoch, ne)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

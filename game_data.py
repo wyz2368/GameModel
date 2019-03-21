@@ -5,6 +5,7 @@ import copy
 class Game_data(object):
     def __init__(self, env, num_layers, num_hidden, num_episodes):
         #TODO: check if env should be initial env, this env should be with G_reserved.
+        print("Reminder: env in game should be same as the initial one since G should be G_reserved.")
         self.env = copy.deepcopy(env)
         self.att_str = []
         self.def_str = []
@@ -61,8 +62,8 @@ class Game_data(object):
         print("Payoff matrix has been initilized by" + " " + str(payoff_def) + " for the defender.")
         print("Payoff matrix has been initilized by" + " " + str(payoff_att) + " for the attacker.")
 
-    #TODO: design the data structure of ne.
-    def add_nasheq(self, ne_name, ne):
+
+    def add_nasheq(self, ne_name, ne): # ne is a dic。 nash is a numpy. 0: def, 1: att
         if not isinstance(ne_name,str):
             raise ValueError("The ne name to be added is not a str." )
         self.nasheq[ne_name] = ne

@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import os
 # import networkx as nx
 # import random
 # import itertools
@@ -59,6 +60,6 @@ import pickle as pk
 
 
 
-print(5%2)
+print(os.getcwd())
 
 

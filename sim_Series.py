@@ -1,6 +1,6 @@
 from parallel_sim import parallel_sim
 from rand_strategies_payoff import rand_parallel_sim
-from deepq import load_action
+from load_action import load_action
 import file_op as fp
 
 #TODO: make sure every
@@ -59,6 +59,7 @@ def sim_and_modifiy(game):
     # num_tasks = 2 * new_dim - 1
     data = {}
 
+    #TODO: check the path is correct
     for pos in position_list:
         idx_def, idx_att = pos
         str_path_def = dir_def + def_str_list[idx_def]

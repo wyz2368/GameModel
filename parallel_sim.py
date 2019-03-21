@@ -71,3 +71,4 @@ def copy_env(env, num_episodes):
         def_list.append(copy.deepcopy(env.defender))
 
     return G_list, att_list, def_list
+
