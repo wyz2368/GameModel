@@ -1,6 +1,7 @@
 import numpy as np
 import file_op as fp
 import copy
+import os
 
 class Game_data(object):
     def __init__(self, env, num_layers, num_hidden, hiddens, num_episodes):
@@ -12,8 +13,10 @@ class Game_data(object):
         self.nasheq = {}
         self.payoffmatrix_def = np.zeros((1,1), dtype=np.float32)
         self.payoffmatrix_att = np.zeros((1,1), dtype=np.float32)
-        self.dir_def = './attackgraph/defender_strategies/'
-        self.dir_att = './attackgraph/attacker_strategies/'
+        self.dir_def = os.getcwd() + '/defender_strategies/'
+        self.dir_att = os.getcwd() + '/attacker_strategies/'
+
+        # define the name of strategy as str_def_epoch1/str_att_epoch1
 
         self.num_episodes = num_episodes
 
@@ -37,7 +40,6 @@ class Game_data(object):
         return np.shape(self.payoffmatrix_att)
 
     def add_att_str(self, str_name):
-        # TODO: check if str_name is an attacker's strategy and if it exists.
         if not fp.isExist(self.dir_att + str_name):
             raise ValueError("This strategy does not exist.")
         if '_att' not in str_name:
@@ -48,7 +50,6 @@ class Game_data(object):
         print(str_name + " has been added to attacker's strategy set")
 
     def add_def_str(self, str_name):
-        # TODO: check if str_name is an attacker's strategy and if it exists.
         if not fp.isExist(self.dir_def + str_name):
             raise ValueError("This strategy does not exist.")
         if '_def' not in str_name:

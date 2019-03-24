@@ -2,8 +2,9 @@ import numpy as np
 import file_op as fp
 from baselines import deepq
 from baselines.common import models
+import os
 
-DIR = './attackgraph/'
+DIR = os.getcwd() + '/'
 #TODO: check all path correct.
 def sample_strategy_from_mixed(env, str_set, mix_str, identity):
     #TODO: Add path
@@ -25,9 +26,10 @@ def sample_strategy_from_mixed(env, str_set, mix_str, identity):
     if not fp.isExist(path + picked_str):
         raise ValueError('The strategy picked does not exist!')
 
+    #TODO: assign nn info from game
     act = deepq.learn(
         env,
-        network=models.mlp(num_hidden=256, num_layers=2),
+        network=models.mlp(num_hidden=256, num_layers=1),
         total_timesteps=0,
         load_path=path+picked_str,
         opponent_str = None
@@ -61,7 +63,7 @@ def sample_both_strategies(env, att_str_set, att_mix_str, def_str_set, def_mix_s
 
     act_att = deepq.learn(
         env,
-        network=models.mlp(num_hidden=256, num_layers=2),
+        network=models.mlp(num_hidden=256, num_layers=1),
         total_timesteps=0,
         load_path=path_att + att_picked_str,
         opponent_str=None
@@ -69,7 +71,7 @@ def sample_both_strategies(env, att_str_set, att_mix_str, def_str_set, def_mix_s
 
     act_def = deepq.learn(
         env,
-        network=models.mlp(num_hidden=256, num_layers=2),
+        network=models.mlp(num_hidden=256, num_layers=1),
         total_timesteps=0,
         load_path=path_def + def_picked_str,
         opponent_str=None

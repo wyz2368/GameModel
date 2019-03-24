@@ -1,8 +1,5 @@
 import os
 import pickle
-import numpy as np
-
-#TODO: path should include ./attackgraph
 
 def mkdir(path):
     path = path.strip()
@@ -28,12 +25,12 @@ def rmfile(path):
     else:
         raise ValueError(path + "does not exist.")
 
-def isExist(path): #TODO: check if this means dir exists or file exists.
+#This works for both dir and file.
+def isExist(path):
     return os.path.exists(path)
 
 def isInName(str,name):
     return str in name
-
 
 def save_pkl(obj,path):
     with open(path,'wb') as f:
@@ -47,14 +44,8 @@ def load_pkl(path):
 
     return result
 
-# path = './attackgraph/payoff_matrix/a'
-
-# a = np.ones((5,5))
-#
-# save_pkl(a,path)
-
-# c = load_pkl(path)
-# print(c)
+# path = './gambit_data/'
+# print(isExist(path))
 
 
 

@@ -1,19 +1,20 @@
 from baselines import deepq
 from baselines.common import models
+import os
 
-DIR_def = './defender_strategies/'
-DIR_att = './attacker_strategies/'
+DIR_def = os.getcwd() + '/defender_strategies/'
+DIR_att = os.getcwd() + '/attacker_strategies/'
 
 #TODO: pick a strategy from a mixed strategy in deeq.learn.
 #TODO: add strategy name to strategy name list.
 #TODO: extend payoff matrix.
 #TODO: network model should be rechecked.
-def training_att(env,mix_str_def,epoch):
+def training_att(env,mix_str_def, epoch):
     env.reset_everything()
     env.set_training_flag = 1
     act_att = deepq.learn(
         env,
-        network = models.mlp(num_hidden=256,num_layers=2),
+        network = models.mlp(num_hidden=256,num_layers=1),
         lr = 5e-5,
         total_timesteps=700000,
         exploration_fraction=0.5,
@@ -35,7 +36,7 @@ def training_def(env,mix_str_att,epoch):
     env.set_training_flag = 0
     act_def = deepq.learn(
         env,
-        network = models.mlp(num_hidden=256,num_layers=2),
+        network = models.mlp(num_hidden=256,num_layers=1),
         lr = 5e-5,
         total_timesteps=700000,
         exploration_fraction=0.5,

@@ -60,14 +60,9 @@ import pickle as pk
 
 
 
-# print(os.getcwd())
+print(isinstance(os.getcwd() + '/defender_strategies/',str))
 
 
-a = {}
-a[1] = 1
-a[2] = 2
-
-print(1 in a.keys())
 
 
 

@@ -1,6 +1,7 @@
 import numpy as np
 import subproc
 import file_op as fp
+import os
 
 # Input arguments: payoff matrix for the defender, poDef; payoff matrix for the attacker, poAtt.
 # In a payoff matrix example: 1 2
@@ -8,8 +9,8 @@ import file_op as fp
 # 							  6 7
 # There are 3 defender strategies (3 rows) and 2 attacker strategies (2 columns).
 # NFG File format: Payoff version
-#TODO: delete attackgraph when running on flux
-gambit_DIR = './attackgraph/gambit_data/payoffmatrix.nfg'
+
+gambit_DIR = os.getcwd() + '/gambit_data/payoffmatrix.nfg'
 
 def encode_gambit_file(poDef, poAtt):
 	try:
@@ -34,12 +35,12 @@ def encode_gambit_file(poDef, poAtt):
 def gambit_analysis(timeout):
 	if not fp.isExist(gambit_DIR):
 		raise ValueError(".nfg file does not exist!")
-	command_str = "gambit-lcp -q ./attackgraph/gambit_data/payoffmatrix.nfg > ./attackgraph/gambit_data/nash.txt"
+	command_str = "gambit-lcp -q " + os.getcwd() + "/gambit_data/payoffmatrix.nfg > " + os.getcwd() + "/gambit_data/nash.txt"
 	subproc.call_and_wait_with_timeout(command_str, timeout)
 	print('gambit_analysis done!')
 
 def decode_gambit_file():
-	nash_DIR = './attackgraph/gambit_data/nash.txt'
+	nash_DIR = os.getcwd() + '/gambit_data/nash.txt'
 	if not fp.isExist(nash_DIR):
 		raise ValueError("nash.txt file does not exist!")
 	with open(nash_DIR,'r') as f:

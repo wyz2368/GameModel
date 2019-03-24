@@ -1,7 +1,8 @@
 import json
 import file_op as fp
+import os
 
-DIR_json = './attackgraph/json_dir/'
+DIR_json = os.getcwd() + '/json_dir/'
 
 def load_json_data(json_file):
     '''
