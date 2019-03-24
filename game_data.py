@@ -3,15 +3,15 @@ import file_op as fp
 import copy
 
 class Game_data(object):
-    def __init__(self, env, num_layers, num_hidden, num_episodes):
+    def __init__(self, env, num_layers, num_hidden, hiddens, num_episodes):
         #TODO: check if env should be initial env, this env should be with G_reserved.
         print("Reminder: env in game should be same as the initial one since G should be G_reserved.")
         self.env = copy.deepcopy(env)
         self.att_str = []
         self.def_str = []
         self.nasheq = {}
-        self.payoffmatrix_def = np.zeros((1,1))
-        self.payoffmatrix_att = np.zeros((1,1))
+        self.payoffmatrix_def = np.zeros((1,1), dtype=np.float32)
+        self.payoffmatrix_att = np.zeros((1,1), dtype=np.float32)
         self.dir_def = './attackgraph/defender_strategies/'
         self.dir_att = './attackgraph/attacker_strategies/'
 
@@ -20,10 +20,12 @@ class Game_data(object):
         # parameters for neural network
         self.num_layers = num_layers
         self.num_hidden = num_hidden
+        self.hiddens = hiddens
 
-    def set_nn_params(self, num_layers, num_hidden):
+    def set_nn_params(self, num_layers, num_hidden, hiddens):
         self.num_layers = num_layers
         self.num_hidden = num_hidden
+        self.hiddens = hiddens
 
     def num_str(self):
         return len(self.att_str), len(self.def_str)
@@ -54,7 +56,7 @@ class Game_data(object):
         if not isinstance(str_name,str):
             raise ValueError("The name to be added is not a str." )
         self.def_str.append(str_name)
-        print(str_name + " has been added to attacker's strategy set")
+        print(str_name + " has been added to defender's strategy set")
 
     def init_payoffmatrix(self, payoff_def, payoff_att):
         self.payoffmatrix_def[0,0] = payoff_def
@@ -64,8 +66,10 @@ class Game_data(object):
 
 
     def add_nasheq(self, ne_name, ne): # ne is a dic。 nash is a numpy. 0: def, 1: att
-        if not isinstance(ne_name,str):
-            raise ValueError("The ne name to be added is not a str." )
+        if not isinstance(ne_name, int):
+            raise ValueError("The ne name to be added is not an integer." )
+        if not isinstance(ne, dict):
+            raise ValueError("The ne to be added is not a dictionary.")
         self.nasheq[ne_name] = ne
 
 
@@ -94,7 +98,7 @@ class Game_data(object):
     def add_row_att(self, row):
         _, num_col = np.shape(self.payoffmatrix_att)
         _, num_col_new = np.shape(row)
-        if num_col == num_col_new:
+        if num_col != num_col_new:
             raise ValueError("Cannot extend attacker row since dim does not match")
         self.payoffmatrix_att = np.append(self.payoffmatrix_att,row, 0)
 
@@ -108,6 +112,6 @@ class Game_data(object):
     def add_row_def(self, row):
         _, num_col = np.shape(self.payoffmatrix_def)
         _, num_col_new = np.shape(row)
-        if num_col == num_col_new:
+        if num_col != num_col_new:
             raise ValueError("Cannot extend defender row since dim does not match")
         self.payoffmatrix_def = np.append(self.payoffmatrix_def, row, 0)

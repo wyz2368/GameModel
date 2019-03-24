@@ -31,11 +31,11 @@ def encode_gambit_file(poDef, poAtt):
 
 	# Gambit passing and NE calculation to come later.
 
-def gambit_analysis():
+def gambit_analysis(timeout):
 	if not fp.isExist(gambit_DIR):
 		raise ValueError(".nfg file does not exist!")
 	command_str = "gambit-lcp -q ./attackgraph/gambit_data/payoffmatrix.nfg > ./attackgraph/gambit_data/nash.txt"
-	subproc.call_and_wait_with_timeout(command_str)
+	subproc.call_and_wait_with_timeout(command_str, timeout)
 	print('gambit_analysis done!')
 
 def decode_gambit_file():
@@ -43,7 +43,10 @@ def decode_gambit_file():
 	if not fp.isExist(nash_DIR):
 		raise ValueError("nash.txt file does not exist!")
 	with open(nash_DIR,'r') as f:
-		nash = f.readline()
+		try:
+			nash = f.readline()
+		except ValueError: #TODO: does not work
+			return 0,0
 
 	nash = nash[3:]
 	nash = nash.split(',')
@@ -59,9 +62,14 @@ def decode_gambit_file():
 	return nash_att, nash_def
 
 def do_gambit_analysis(poDef, poAtt):
+	timeout = 60
 	encode_gambit_file(poDef, poAtt)
-	gambit_analysis()
-	nash_att, nash_def = decode_gambit_file()
+	while True:
+		gambit_analysis(timeout)
+		nash_att, nash_def = decode_gambit_file()
+		timeout += 120
+		if isinstance(nash_def,np.ndarray) and isinstance(nash_att,np.ndarray):
+			break
 	return nash_att, nash_def
 
 
@@ -74,6 +82,12 @@ def convert(s):
 
 # ne is a dic。 nash is a numpy. 0: def, 1: att
 def add_new_NE(game, nash_att, nash_def, epoch):
+	if not isinstance(nash_att,np.ndarray):
+		raise ValueError("nash_att is not numpy array.")
+	if not isinstance(nash_def,np.ndarray):
+		raise ValueError("nash_def is not numpy array.")
+	if not isinstance(epoch,int):
+		raise ValueError("Epoch is not an integer.")
 	ne = {}
 	ne[0] = nash_def
 	ne[1] = nash_att

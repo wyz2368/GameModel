@@ -15,6 +15,15 @@ def payoff_mixed_NE(game, epoch):
     if dim_row_def != dim_col_def or dim_row_att != dim_col_att:
         raise ValueError("Dimension of payoff matrix does not match!")
 
+    if dim_row_def != dim_row_att:
+        raise ValueError("Dimension of payoff matrix does not match!")
+
+    if epoch > dim_col_att:
+        raise ValueError("Epoch exceeds the payoffmatrix dimension.")
+
+    if not epoch in game.nasheq.keys():
+        raise ValueError("Epoch is not a key of current nasheq.")
+
     ne = game.nasheq[epoch]
     nash_def = ne[0]
     nash_att = ne[1]
@@ -26,7 +35,7 @@ def payoff_mixed_NE(game, epoch):
 
     nash_def = np.reshape(nash_def,newshape=(num_str,1))
 
-    dPayoff = np.sum(nash_def * sub_payoffmatrix_def * nash_att)
-    aPayoff = np.sum(nash_def * sub_payoffmatrix_att * nash_att)
+    dPayoff = np.round(np.sum(nash_def * sub_payoffmatrix_def * nash_att), decimals=2)
+    aPayoff = np.round(np.sum(nash_def * sub_payoffmatrix_att * nash_att), decimals=2)
 
     return aPayoff, dPayoff

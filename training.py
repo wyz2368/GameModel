@@ -7,6 +7,7 @@ DIR_att = './attacker_strategies/'
 #TODO: pick a strategy from a mixed strategy in deeq.learn.
 #TODO: add strategy name to strategy name list.
 #TODO: extend payoff matrix.
+#TODO: network model should be rechecked.
 def training_att(env,mix_str_def,epoch):
     env.reset_everything()
     env.set_training_flag = 1
