@@ -37,7 +37,7 @@ def gambit_analysis(timeout):
         raise ValueError(".nfg file does not exist!")
     command_str = "gambit-lcp -q " + os.getcwd() + "/gambit_data/payoffmatrix.nfg > " + os.getcwd() + "/gambit_data/nash.txt"
     subproc.call_and_wait_with_timeout(command_str, timeout)
-    print('gambit_analysis done!')
+
 
 def decode_gambit_file():
     nash_DIR = os.getcwd() + '/gambit_data/nash.txt'
@@ -62,15 +62,18 @@ def decode_gambit_file():
     return nash_att, nash_def
 
 def do_gambit_analysis(poDef, poAtt):
-    timeout = 120
-    encode_gambit_file(poDef, poAtt)
+    timeout = 3600
+    encode_gambit_file(poDef, poAtt) #TODO:change timeout adaptive
     while True:
         gambit_analysis(timeout)
         nash_att, nash_def = decode_gambit_file()
         timeout += 120
+        if timeout > 7200:
+            print("Gambit has been running for more than 2 hour.!")
         if isinstance(nash_def,np.ndarray) and isinstance(nash_att,np.ndarray):
             break
-    print("Timeout has been added by 120s.")
+        print("Timeout has been added by 120s.")
+    print('gambit_analysis done!')
     return nash_att, nash_def
 
 
