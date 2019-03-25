@@ -116,3 +116,5 @@ class Game_data(object):
         if num_col != num_col_new:
             raise ValueError("Cannot extend defender row since dim does not match")
         self.payoffmatrix_def = np.append(self.payoffmatrix_def, row, 0)
+
+

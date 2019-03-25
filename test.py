@@ -63,25 +63,32 @@ import pickle as pk
 # print(np.random.choice(a, p=np.array([0.3,0.3,0.4])))
 
 
-class Dog(object):
-    def top(self,env):
-        self.mytop = env
+# class Dog(object):
+#     def top(self,env):
+#         self.mytop = env
+#
+# class Animal(object):
+#     def __init__(self):
+#         self.dog = Dog()
+#         self.age = 5
+#
+#
+# a = Animal()
+#
+# a.dog.top(a)
+#
+# print(a.dog.mytop.age)
 
-class Animal(object):
-    def __init__(self):
-        self.dog = Dog()
-        self.age = 5
+new_dim = 6
+position_col_list = []
+position_row_list = []
+for i in range(new_dim - 1):
+    position_col_list.append((i, new_dim - 1))
+for j in range(new_dim):
+    position_row_list.append((new_dim - 1, j))
 
-
-a = Animal()
-
-a.dog.top(a)
-
-print(a.dog.mytop.age)
-
-
-
-
+print(position_col_list)
+print(position_row_list)
 
 
 
