@@ -3,11 +3,13 @@
   <component name="ChangeListManager">
     <list default="true" id="a694c42b-8418-4693-8f96-d5e0d7c8d985" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/attacker.py" beforeDir="false" afterPath="$PROJECT_DIR$/attacker.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/defender.py" beforeDir="false" afterPath="$PROJECT_DIR$/defender.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/parallel_sim.py" beforeDir="false" afterPath="$PROJECT_DIR$/parallel_sim.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/sample_strategy.py" beforeDir="false" afterPath="$PROJECT_DIR$/sample_strategy.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gambit_analysis.py" beforeDir="false" afterPath="$PROJECT_DIR$/gambit_analysis.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gambit_data/nash.txt" beforeDir="false" afterPath="$PROJECT_DIR$/gambit_data/nash.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gambit_data/payoffmatrix.nfg" beforeDir="false" afterPath="$PROJECT_DIR$/gambit_data/payoffmatrix.nfg" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/subproc.py" beforeDir="false" afterPath="$PROJECT_DIR$/subproc.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/test.py" beforeDir="false" afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/testing/test_gambit.py" beforeDir="false" afterPath="$PROJECT_DIR$/testing/test_gambit.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -17,61 +19,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sim_Series.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="311">
-              <caret line="79" column="56" selection-start-line="79" selection-start-column="56" selection-end-line="79" selection-end-column="56" />
-              <folding>
-                <element signature="e#0#37#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/simulation.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="597">
-              <caret line="28" column="36" lean-forward="true" selection-start-line="28" selection-start-column="36" selection-end-line="28" selection-end-column="36" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/parallel_sim.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1081">
-              <caret line="60" column="22" lean-forward="true" selection-start-line="60" selection-start-column="22" selection-end-line="60" selection-end-column="22" />
-              <folding>
-                <element signature="e#0#28#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/defender.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="22" column="67" selection-start-line="22" selection-start-column="49" selection-end-line="22" selection-end-column="67" />
-              <folding>
-                <element signature="e#0#13#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/attacker.py">
+        <entry file="file://$PROJECT_DIR$/gambit_analysis.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-2461">
-              <caret line="36" column="69" selection-start-line="36" selection-start-column="69" selection-end-line="36" selection-end-column="69" />
+            <state relative-caret-position="399">
+              <caret line="64" column="17" selection-start-line="64" selection-start-column="17" selection-end-line="64" selection-end-column="17" />
               <folding>
-                <element signature="e#0#13#0" expanded="true" />
+                <element signature="e#0#18#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -80,8 +34,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/testing/test_gambit.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="220">
-              <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
+            <state relative-caret-position="729">
+              <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
               <folding>
                 <element signature="e#0#28#0" expanded="true" />
               </folding>
@@ -90,48 +44,33 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/gambit_analysis.py">
+        <entry file="file://$PROJECT_DIR$/gambit_data/nash.txt">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="968">
-              <caret line="47" column="20" selection-start-line="47" selection-start-column="20" selection-end-line="47" selection-end-column="20" />
+            <state>
+              <caret column="5" selection-start-column="5" selection-end-column="5" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/subproc.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="355">
+              <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#0#17#0" expanded="true" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/sample_strategy.py">
+        <entry file="file://$PROJECT_DIR$/test.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="553">
-              <caret line="95" column="73" selection-start-line="95" selection-start-column="73" selection-end-line="95" selection-end-column="73" />
+            <state relative-caret-position="534">
+              <caret line="81" column="1" selection-start-line="81" selection-start-column="1" selection-end-line="81" selection-end-column="1" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/game_data.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="333">
-              <caret line="91" column="19" selection-start-line="91" selection-start-column="8" selection-end-line="91" selection-end-column="19" />
-              <folding>
-                <element signature="e#0#18#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/training.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="110">
-              <caret line="5" selection-start-line="5" selection-end-line="6" selection-end-column="47" />
-              <folding>
-                <element signature="e#0#27#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -172,10 +111,14 @@
     <replaceStrings>
       <replace>(G,id,value)</replace>
       <replace>env</replace>
+      <replace />
     </replaceStrings>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/gambit_analysis.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
@@ -199,21 +142,22 @@
         <option value="$PROJECT_DIR$/rand_strategies_payoff.py" />
         <option value="$PROJECT_DIR$/sim_MPI.py" />
         <option value="$PROJECT_DIR$/file_op.py" />
-        <option value="$PROJECT_DIR$/subproc.py" />
         <option value="$PROJECT_DIR$/testing/test_game_data.py" />
         <option value="$PROJECT_DIR$/util.py" />
-        <option value="$PROJECT_DIR$/gambit_analysis.py" />
-        <option value="$PROJECT_DIR$/testing/test_gambit.py" />
         <option value="$PROJECT_DIR$/DagGenerator.py" />
         <option value="$PROJECT_DIR$/training.py" />
         <option value="$PROJECT_DIR$/game_data.py" />
-        <option value="$PROJECT_DIR$/test.py" />
         <option value="$PROJECT_DIR$/sim_Series.py" />
         <option value="$PROJECT_DIR$/parallel_sim.py" />
-        <option value="$PROJECT_DIR$/simulation.py" />
         <option value="$PROJECT_DIR$/sample_strategy.py" />
         <option value="$PROJECT_DIR$/defender.py" />
         <option value="$PROJECT_DIR$/attacker.py" />
+        <option value="$PROJECT_DIR$/simulation.py" />
+        <option value="$PROJECT_DIR$/testing/test_gambit.py" />
+        <option value="$PROJECT_DIR$/subproc.py" />
+        <option value="$PROJECT_DIR$/test.py" />
+        <option value="$PROJECT_DIR$/gambit_data/nash.txt" />
+        <option value="$PROJECT_DIR$/gambit_analysis.py" />
       </list>
     </option>
   </component>
@@ -276,7 +220,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.test">
+  <component name="RunManager" selected="Python.gambit_analysis">
     <configuration default="true" type="PythonConfigurationType" factoryName="Python">
       <module name="attackgraph" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -298,19 +242,40 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="file_op" type="PythonConfigurationType" factoryName="Python" temporary="true">
+    <configuration name="gambit_analysis" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="attackgraph" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/envs/tensorflow_env/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/file_op.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/gambit_analysis.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="subproc" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="attackgraph" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/subproc.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -340,27 +305,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <configuration name="testENV2" type="PythonConfigurationType" factoryName="Python" temporary="true">
-      <module name="attackgraph" />
-      <option name="INTERPRETER_OPTIONS" value="" />
-      <option name="PARENT_ENVS" value="true" />
-      <envs>
-        <env name="PYTHONUNBUFFERED" value="1" />
-      </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/envs/tensorflow_env/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
-      <option name="IS_MODULE_SDK" value="true" />
-      <option name="ADD_CONTENT_ROOTS" value="true" />
-      <option name="ADD_SOURCE_ROOTS" value="true" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/testing/testENV2.py" />
-      <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="false" />
-      <option name="EMULATE_TERMINAL" value="false" />
-      <option name="MODULE_MODE" value="false" />
-      <option name="REDIRECT_INPUT" value="false" />
-      <option name="INPUT_FILE" value="" />
-      <method v="2" />
-    </configuration>
     <configuration name="test_gambit" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="attackgraph" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -368,8 +312,8 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="$USER_HOME$/anaconda3/envs/tensorflow_env/bin/python" />
-      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/.." />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
@@ -424,13 +368,21 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <list>
+      <item itemvalue="Python.test" />
+      <item itemvalue="Python.test_gambit" />
+      <item itemvalue="Python.test_game_data" />
+      <item itemvalue="Python.training" />
+      <item itemvalue="Python.gambit_analysis" />
+      <item itemvalue="Python.subproc" />
+    </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Python.test_game_data" />
+        <item itemvalue="Python.gambit_analysis" />
         <item itemvalue="Python.test_gambit" />
+        <item itemvalue="Python.subproc" />
+        <item itemvalue="Python.test_game_data" />
         <item itemvalue="Python.training" />
-        <item itemvalue="Python.file_op" />
-        <item itemvalue="Python.testENV2" />
       </list>
     </recent_temporary>
   </component>
@@ -732,7 +684,14 @@
       <option name="project" value="LOCAL" />
       <updated>1553479561524</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="&quot;add mask to nn&quot;">
+      <created>1553530862479</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1553530862479</updated>
+    </task>
+    <option name="localTasksCounter" value="43" />
     <servers />
   </component>
   <component name="TodoView" selected-index="4">
@@ -748,13 +707,13 @@
     <frame x="65" y="-4" width="1855" height="1084" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.115720525" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.115720525" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32970297" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49964765" weight="0.39602926" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.44059405" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.4399164" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32970297" />
@@ -772,7 +731,8 @@
     <MESSAGE value="&quot;basic dagraph fix bugs&quot;" />
     <MESSAGE value="&quot;add gambit&quot;" />
     <MESSAGE value="&quot;modify sampling&quot;" />
-    <option name="LAST_COMMIT_MESSAGE" value="&quot;modify sampling&quot;" />
+    <MESSAGE value="&quot;add mask to nn&quot;" />
+    <option name="LAST_COMMIT_MESSAGE" value="&quot;add mask to nn&quot;" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/deeprltest.py" />
@@ -821,9 +781,6 @@
           </folding>
         </state>
       </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gambit_data/payoffmatrix.nfg">
-      <provider selected="true" editor-type-id="text-editor" />
     </entry>
     <entry file="file://$PROJECT_DIR$/file_op.py">
       <provider selected="true" editor-type-id="text-editor">
@@ -875,19 +832,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/gambit_data/nash.txt">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/subproc.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="255">
-          <caret line="15" column="23" lean-forward="true" selection-start-line="15" selection-start-column="23" selection-end-line="15" selection-end-column="23" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/testing/test_game_data.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="198">
@@ -918,39 +862,9 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1936">
-          <caret line="97" selection-start-line="97" selection-end-line="97" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/gambit_analysis.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="968">
-          <caret line="47" column="20" selection-start-line="47" selection-start-column="20" selection-end-line="47" selection-end-column="20" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/testing/test_gambit.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="220">
-          <caret line="10" column="22" selection-start-line="10" selection-start-column="22" selection-end-line="10" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#28#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/sim_Series.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="311">
+        <state relative-caret-position="641">
           <caret line="79" column="56" selection-start-line="79" selection-start-column="56" selection-end-line="79" selection-end-column="56" />
           <folding>
             <element signature="e#0#37#0" expanded="true" />
@@ -958,32 +872,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/training.py">
+    <entry file="file://$PROJECT_DIR$/simulation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="110">
-          <caret line="5" selection-start-line="5" selection-end-line="6" selection-end-column="47" />
+        <state relative-caret-position="44">
+          <caret line="2" lean-forward="true" selection-start-line="2" selection-end-line="2" />
           <folding>
-            <element signature="e#0#27#0" expanded="true" />
+            <element signature="e#0#13#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/game_data.py">
+    <entry file="file://$PROJECT_DIR$/parallel_sim.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="333">
-          <caret line="91" column="19" selection-start-line="91" selection-start-column="8" selection-end-line="91" selection-end-column="19" />
+        <state relative-caret-position="817">
+          <caret line="60" column="22" lean-forward="true" selection-start-line="60" selection-start-column="22" selection-end-line="60" selection-end-column="22" />
           <folding>
-            <element signature="e#0#18#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/sample_strategy.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="553">
-          <caret line="95" column="73" selection-start-line="95" selection-start-column="73" selection-end-line="95" selection-end-column="73" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -998,32 +902,92 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/parallel_sim.py">
+    <entry file="file://$PROJECT_DIR$/attacker.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1081">
-          <caret line="60" column="22" lean-forward="true" selection-start-line="60" selection-start-column="22" selection-end-line="60" selection-end-column="22" />
+        <state relative-caret-position="242">
+          <caret line="11" column="30" lean-forward="true" selection-start-line="11" selection-start-column="30" selection-end-line="11" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#13#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/sample_strategy.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="553">
+          <caret line="95" column="73" selection-start-line="95" selection-start-column="73" selection-end-line="95" selection-end-column="73" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/game_data.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1804">
+          <caret line="91" column="19" selection-start-line="91" selection-start-column="8" selection-end-line="91" selection-end-column="19" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/training.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="110">
+          <caret line="5" selection-start-line="5" selection-end-line="6" selection-end-column="47" />
+          <folding>
+            <element signature="e#0#27#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gambit_data/payoffmatrix.nfg">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/testing/test_gambit.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="729">
+          <caret line="38" lean-forward="true" selection-start-line="38" selection-end-line="38" />
           <folding>
             <element signature="e#0#28#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulation.py">
+    <entry file="file://$PROJECT_DIR$/subproc.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="597">
-          <caret line="28" column="36" lean-forward="true" selection-start-line="28" selection-start-column="36" selection-end-line="28" selection-end-column="36" />
+        <state relative-caret-position="355">
+          <caret line="18" lean-forward="true" selection-start-line="18" selection-end-line="18" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#17#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/attacker.py">
+    <entry file="file://$PROJECT_DIR$/test.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-2461">
-          <caret line="36" column="69" selection-start-line="36" selection-start-column="69" selection-end-line="36" selection-end-column="69" />
+        <state relative-caret-position="534">
+          <caret line="81" column="1" selection-start-line="81" selection-start-column="1" selection-end-line="81" selection-end-column="1" />
           <folding>
-            <element signature="e#0#13#0" expanded="true" />
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gambit_data/nash.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <caret column="5" selection-start-column="5" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/gambit_analysis.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="399">
+          <caret line="64" column="17" selection-start-line="64" selection-start-column="17" selection-end-line="64" selection-end-column="17" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
           </folding>
         </state>
       </provider>

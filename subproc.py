@@ -15,6 +15,7 @@ def call_and_wait_with_timeout(command_str, timeout):
     time.sleep(sleep_sec)
     # my_process.kill()
     os.killpg(os.getpgid(my_process.pid), signal.SIGTERM)
+    print("Subprocess has been killed.")
 
 def call_and_wait(command_str):
     print("Will run:\n" + command_str)

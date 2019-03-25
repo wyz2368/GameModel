@@ -79,16 +79,16 @@ import pickle as pk
 #
 # print(a.dog.mytop.age)
 
-new_dim = 6
-position_col_list = []
-position_row_list = []
-for i in range(new_dim - 1):
-    position_col_list.append((i, new_dim - 1))
-for j in range(new_dim):
-    position_row_list.append((new_dim - 1, j))
-
-print(position_col_list)
-print(position_row_list)
+# new_dim = 6
+# position_col_list = []
+# position_row_list = []
+# for i in range(new_dim - 1):
+#     position_col_list.append((i, new_dim - 1))
+# for j in range(new_dim):
+#     position_row_list.append((new_dim - 1, j))
+#
+# print(position_col_list)
+# print(position_row_list)
 
 
 
