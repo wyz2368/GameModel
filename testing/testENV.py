@@ -166,7 +166,7 @@ env.create_players()
 
 t1 = time.time()
 # payoff_att, payoff_def, ta, tb, tc = rp.parallel_sim(env,1000)
-a,b  = rp.parallel_sim(env,1000)
+a,b  = rp.rand_parallel_sim(env,1000)
 t2 = time.time()
 
 t3 = time.time()

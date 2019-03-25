@@ -143,7 +143,28 @@ class Environment(object):
             self.setACost_E(edge, -np.random.uniform(0, EmaxACost))
             self.setActProb_E(edge, np.random.uniform(0, 1))
 
-
+        # TODO: remove the first line. Check if G has been initialized.
+    def specifiedDAG(self, attributesDict):
+        # self.daggenerator_wo_attrs(attributesDict['nodes'], attributesDict['edges'])
+        for nodeID in attributesDict['nodes']:
+            self.setRoot_N(nodeID, attributesDict['Nroots'][nodeID - 1])
+            self.setType_N(nodeID, attributesDict['Ntypes'][nodeID - 1])
+            self.setActivationType_N(nodeID, attributesDict['NeTypes'][nodeID - 1])
+            self.setState_N(nodeID, attributesDict['Nstates'][nodeID - 1])
+            self.setAReward_N(nodeID, attributesDict['NaRewards'][nodeID - 1])
+            self.setDPenalty_N(nodeID, attributesDict['NdPenalties'][nodeID - 1])
+            self.setDCost_N(nodeID, attributesDict['NdCosts'][nodeID - 1])
+            self.setACost_N(nodeID, attributesDict['NaCosts'][nodeID - 1])
+            self.setposActiveProb_N(nodeID, attributesDict['NposActiveProbs'][nodeID - 1])
+            self.setposInactiveProb_N(nodeID, attributesDict['NposInactiveProbs'][nodeID - 1])
+            self.setActProb_N(nodeID, attributesDict['NactProbs'][nodeID - 1])
+        idx = 0
+        for edge in attributesDict['edges']:
+            self.setid_E(edge, attributesDict['Eeids'][idx])
+            self.setType_E(edge, attributesDict['Etypes'][idx])
+            self.setACost_E(edge, attributesDict['Ecosts'][idx])
+            self.setActProb_E(edge, attributesDict['actProb'][idx])
+            idx += 1
 
     # Visualizes DAG
     # Node did not visualize: aReward, dPenalty, dCost, aCost, posActiveProb, posInactiveProb, actProb, topoPosition
