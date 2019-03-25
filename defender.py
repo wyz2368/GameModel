@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import sample_strategy as ss
 
 class Defender(object):
 
@@ -17,6 +18,9 @@ class Defender(object):
     def def_greedy_action_builder(self, G, timeleft):
         self.defact.clear()
         isDup = False
+        #TODO: sample a strategy
+        nn = ss.sample_strategy_from_mixed(env=self.myenv,str_set=self.str_set,mix_str=self.mix_str,identity=0)
+        self.set_current_strategy(nn)
         while not isDup:
             def_input = self.def_obs_constructor(G, timeleft)
             x = self.nn_def(def_input[None])[0] #corrensponding to baselines
@@ -97,3 +101,12 @@ class Defender(object):
     def set_current_strategy(self,strategy):
         self.nn_def = strategy
 
+    #TODO: call this while creating env
+    def set_env_belong_to(self,env):
+        self.myenv = env
+
+    def set_mix_strategy(self,mix):
+        self.mix_str = mix
+
+    def set_str_set(self,set):
+        self.str_set = set

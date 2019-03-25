@@ -57,10 +57,47 @@ import pickle as pk
 # print(sess.run(random_actions))
 
 
+# print(isinstance(os.getcwd() + '/defender_strategies/',str))
+
+# a = ['1','2','3']
+# print(np.random.choice(a, p=np.array([0.3,0.3,0.4])))
+
+
+class Dog(object):
+    def top(self,env):
+        self.mytop = env
+
+class Animal(object):
+    def __init__(self):
+        self.dog = Dog()
+        self.age = 5
+
+
+a = Animal()
+
+a.dog.top(a)
+
+print(a.dog.mytop.age)
 
 
 
-print(isinstance(os.getcwd() + '/defender_strategies/',str))
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

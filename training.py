@@ -1,17 +1,22 @@
 from baselines import deepq
 from baselines.common import models
 import os
+#TODO: improvement can be done by not including all RL strategies.
 
 DIR_def = os.getcwd() + '/defender_strategies/'
 DIR_att = os.getcwd() + '/attacker_strategies/'
 
-#TODO: pick a strategy from a mixed strategy in deeq.learn.
+#TODO: pick a strategy from a mixed strategy.
 #TODO: add strategy name to strategy name list.
 #TODO: extend payoff matrix.
 #TODO: network model should be rechecked.
-def training_att(env,mix_str_def, epoch):
+def training_att(env, game, mix_str_def, epoch):
     env.reset_everything()
     env.set_training_flag = 1
+
+    env.defender.set_mix_strategy(mix_str_def)
+    env.defender.set_str_set(game.def_str)
+
     act_att = deepq.learn(
         env,
         network = models.mlp(num_hidden=256,num_layers=1),
@@ -23,17 +28,22 @@ def training_att(env,mix_str_def, epoch):
         param_noise=False,
         gamma=0.99,
         prioritized_replay=True,
-        checkpoint_freq=30000,
-        opponent_str=mix_str_def
+        checkpoint_freq=30000
     )
     print("Saving attacker's model to pickle.")
     act_att.save(DIR_att + "att_str_epoch" + str(epoch) + ".pkl")
-    return act_att
+    game.att_str.append("att_str_epoch" + str(epoch) + ".pkl")
 
 
-def training_def(env,mix_str_att,epoch):
+
+
+def training_def(env, game, mix_str_att, epoch):
     env.reset_everything()
     env.set_training_flag = 0
+
+    env.attacker.set_mix_strategy(mix_str_att)
+    env.attacker.set_str_set(game.att_str)
+
     act_def = deepq.learn(
         env,
         network = models.mlp(num_hidden=256,num_layers=1),
@@ -45,10 +55,10 @@ def training_def(env,mix_str_att,epoch):
         param_noise=False,
         gamma=0.99,
         prioritized_replay=True,
-        checkpoint_freq=30000,
-        opponent_str = mix_str_att
+        checkpoint_freq=30000
     )
     print("Saving defender's model to pickle.")
     act_def.save(DIR_def + "def_str_epoch" + str(epoch) + ".pkl")
-    return act_def
+    game.def_str.append("def_str_epoch" + str(epoch) + ".pkl")
+
 

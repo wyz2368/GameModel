@@ -545,7 +545,7 @@ class Environment(object):
         # immediate reward for both players
         aReward = 0
         dReward = 0
-        #TODO: set nn_def or nn_att first.
+        #TODO: set nn_def or nn_att first. Sample from mixed strategy.
         #TODO: check the logic of saving act to prev_act
         if self.training_flag == 0: # If the defender is training, attacker builds greedy set. Vice Versa.
             self.attacker.att_greedy_action_builder(self.G, self.T - self.current_time)

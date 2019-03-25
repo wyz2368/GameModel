@@ -5,15 +5,17 @@ from baselines.common import models
 import os
 
 DIR = os.getcwd() + '/'
-#TODO: check all path correct.
+
 def sample_strategy_from_mixed(env, str_set, mix_str, identity):
-    #TODO: Add path
-    #TODO: explain opponent_str is None
+
+    if not isinstance(mix_str,np.ndarray):
+        raise ValueError("mix_str in sample func is not a numpy array.")
+
     if not len(str_set) == len(mix_str):
         raise ValueError("Length of mixed strategies does not match number of strategies.")
 
     picked_str = np.random.choice(str_set,p=mix_str)
-    if not fp.isInName('.pkl',name=picked_str):
+    if not fp.isInName('.pkl', name = picked_str):
         raise ValueError('The strategy picked is not a pickle file.')
 
     if identity == 0: # pick a defender's strategy
@@ -31,15 +33,13 @@ def sample_strategy_from_mixed(env, str_set, mix_str, identity):
         env,
         network=models.mlp(num_hidden=256, num_layers=1),
         total_timesteps=0,
-        load_path=path+picked_str,
-        opponent_str = None
+        load_path= path + picked_str
     )
 
     return act
 
 def sample_both_strategies(env, att_str_set, att_mix_str, def_str_set, def_mix_str):
-    # TODO: Add path
-    # TODO: explain opponent_str is None
+
     if not len(att_str_set) == len(att_mix_str):
         raise ValueError("Length of mixed strategies does not match number of strategies for the attacker.")
     if not len(def_str_set) == len(def_mix_str):
@@ -65,16 +65,14 @@ def sample_both_strategies(env, att_str_set, att_mix_str, def_str_set, def_mix_s
         env,
         network=models.mlp(num_hidden=256, num_layers=1),
         total_timesteps=0,
-        load_path=path_att + att_picked_str,
-        opponent_str=None
+        load_path=path_att + att_picked_str
     )
 
     act_def = deepq.learn(
         env,
         network=models.mlp(num_hidden=256, num_layers=1),
         total_timesteps=0,
-        load_path=path_def + def_picked_str,
-        opponent_str=None
+        load_path= path_def + def_picked_str
     )
 
     return act_att, act_def

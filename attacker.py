@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import sample_strategy as ss
 
 class Attacker(object):
 
@@ -14,6 +15,9 @@ class Attacker(object):
     def att_greedy_action_builder(self, G, timeleft):
         self.attact.clear()
         isDup = False
+        #TODO:sample a strategy
+        nn = ss.sample_strategy_from_mixed(env=self.myenv, str_set=self.str_set, mix_str=self.mix_str, identity=1)
+        self.set_current_strategy(nn)
         while not isDup:
             att_input = self.att_obs_constructor(G, timeleft)
             x = self.nn_att(att_input[None])[0] #corrensponding to baselines
@@ -117,9 +121,6 @@ class Attacker(object):
     def update_canAttack(self,obs):
         self.canAttack = obs
 
-    def set_current_strategy(self,strategy):
-        self.nn_att = strategy
-
 
     # Designed for mask function
     def get_att_canAttack_mask(self, G):
@@ -150,3 +151,16 @@ class Attacker(object):
                 canAttack.append(-100)
 
         return canAttack
+
+    def set_current_strategy(self,strategy):
+        self.nn_att = strategy
+
+    def set_env_belong_to(self,env):
+        self.myenv = env
+
+    def set_mix_strategy(self,mix):
+        self.mix_str = mix
+
+    def set_str_set(self,set):
+        self.str_set = set
+

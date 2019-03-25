@@ -12,8 +12,8 @@ import time
 
 # ga.decode_gambit_file()
 
-poDef = np.random.normal(size=(100,100))
-poAtt = np.random.normal(size=(100,100))
+poDef = np.random.normal(size=(10,10))
+poAtt = np.random.normal(size=(10,10))
 poDef = np.round(poDef,2)
 poAtt = np.round(poAtt,2)
 
