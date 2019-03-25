@@ -15,19 +15,40 @@ class Defender(object):
 
         self.rand_limit = 4
 
+
+    #TODO: nn should input mask!!!!!!! ALL zeros.
     def def_greedy_action_builder(self, G, timeleft):
         self.defact.clear()
         isDup = False
+        mask = np.zeros(shape=(1, self.num_nodes), dtype=np.float32)
         #TODO: sample a strategy
         nn = ss.sample_strategy_from_mixed(env=self.myenv,str_set=self.str_set,mix_str=self.mix_str,identity=0)
         self.set_current_strategy(nn)
         while not isDup:
             def_input = self.def_obs_constructor(G, timeleft)
-            x = self.nn_def(def_input[None])[0] #corrensponding to baselines
+            x = self.nn_def(def_input[None], mask)[0] #corrensponding to baselines
             if not isinstance(x,int):
                 raise ValueError("The chosen action is not an integer.")
             action_space = self.get_def_actionspace(G)
             action = action_space[x] #TODO: make sure whether x starting from 0 or 1.
+            if action == 'pass':
+                break
+            isDup = (action in self.defact)
+            if not isDup:
+                self.defact.add(action)
+
+    def def_greedy_action_builder_single(self, G, timeleft, nn_def):
+        self.defact.clear()
+        isDup = False
+        mask = np.zeros(shape=(1, self.num_nodes), dtype=np.float32)
+
+        while not isDup:
+            def_input = self.def_obs_constructor(G, timeleft)
+            x = nn_def(def_input[None], mask)[0] #corrensponding to baselines
+            if not isinstance(x,int):
+                raise ValueError("The chosen action is not an integer.")
+            action_space = self.get_def_actionspace(G)
+            action = action_space[x] # x starting from 0.
             if action == 'pass':
                 break
             isDup = (action in self.defact)

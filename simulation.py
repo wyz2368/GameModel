@@ -15,9 +15,9 @@ def simulation(env, attacker, nn_att, defender, nn_def, num_episodes):
         defender.reset_def()
         for t in range(env.T):
             timeleft = env.T - t
-            attacker.att_greedy_action_builder(env.G, timeleft, nn_att)
+            attacker.att_greedy_action_builder_single(env.G, timeleft, nn_att)
             att_action_set = attacker.attact
-            defender.def_greedy_action_builder(env.G, timeleft, nn_def)
+            defender.def_greedy_action_builder_single(env.G, timeleft, nn_def)
             def_action_set = defender.defact
             for attack in att_action_set:
                 if isinstance(attack, tuple):

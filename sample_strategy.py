@@ -5,6 +5,8 @@ from baselines.common import models
 import os
 
 DIR = os.getcwd() + '/'
+DIR_def = os.getcwd() + '/defender_strategies/'
+DIR_att = os.getcwd() + '/attacker_strategies/'
 
 def sample_strategy_from_mixed(env, str_set, mix_str, identity):
 
@@ -76,3 +78,29 @@ def sample_both_strategies(env, att_str_set, att_mix_str, def_str_set, def_mix_s
     )
 
     return act_att, act_def
+
+#TODO: check the input dim of nn and check if this could initialize nn.
+def rand_str_generator(env, game):
+    # Generate random nn for attacker.
+    num_layers = game.num_layers
+    num_hidden = game.num_hidden
+
+    act_att = deepq.learn(
+        env,
+        network=models.mlp(num_hidden=num_hidden, num_layers=num_layers-3),
+        total_timesteps=0
+    )
+
+    act_def = deepq.learn(
+        env,
+        network=models.mlp(num_hidden=num_hidden, num_layers=num_layers-3),
+        total_timesteps=0
+    )
+
+    print("Saving attacker's model to pickle. Epoch name is equal to 1.")
+    act_att.save(DIR_att + "att_str_epoch" + str(1) + ".pkl")
+    game.att_str.append("att_str_epoch" + str(1) + ".pkl")
+
+    print("Saving defender's model to pickle. Epoch in name is equal to 1.")
+    act_def.save(DIR_def + "def_str_epoch" + str(1) + ".pkl")
+    game.def_str.append("def_str_epoch" + str(1) + ".pkl")

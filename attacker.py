@@ -2,6 +2,7 @@ import random
 import numpy as np
 import sample_strategy as ss
 
+
 class Attacker(object):
 
     def __init__(self, oredges, andnodes, actionspace):
@@ -12,15 +13,31 @@ class Attacker(object):
         self.ANDnodes = andnodes
         self.actionspace = actionspace
 
+    # TODO: nn should input mask!!!!!!!
     def att_greedy_action_builder(self, G, timeleft):
         self.attact.clear()
         isDup = False
+        mask = np.array([self.get_att_canAttack(G)], dtype=np.float32)
         #TODO:sample a strategy
         nn = ss.sample_strategy_from_mixed(env=self.myenv, str_set=self.str_set, mix_str=self.mix_str, identity=1)
         self.set_current_strategy(nn)
         while not isDup:
             att_input = self.att_obs_constructor(G, timeleft)
-            x = self.nn_att(att_input[None])[0] #corrensponding to baselines
+            x = self.nn_att(att_input[None], mask)[0] #corrensponding to baselines
+            action = self.actionspace[x]
+            if action == 'pass':
+                break
+            isDup = (action in self.attact)
+            if not isDup:
+                self.attact.add(action)
+
+    def att_greedy_action_builder_single(self, G, timeleft, nn_att):
+        self.attact.clear()
+        isDup = False
+        mask = np.array([self.get_att_canAttack(G)], dtype=np.float32)
+        while not isDup:
+            att_input = self.att_obs_constructor(G, timeleft)
+            x = nn_att(att_input[None], mask)[0] #corrensponding to baselines
             action = self.actionspace[x]
             if action == 'pass':
                 break

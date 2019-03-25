@@ -7,6 +7,8 @@ import time
 #TODO: create different copy of env.
 #TODO: fix one set of strategies.
 #TODO: check [nn]*num_episodes
+#TODO: nn should change to mixed strategy
+#TODO: API has been changed.
 def parallel_sim(env, nn_att, nn_def, num_episodes):
     G_list, att_list, def_list = copy_env(env, num_episodes)
     arg = list(zip(G_list,att_list,[nn_att]*num_episodes,def_list,[nn_def]*num_episodes,[env.T]*num_episodes))
@@ -25,9 +27,9 @@ def single_sim(param): #single for single episode.
 
     for t in range(T):
         timeleft = T - t
-        attacker.att_greedy_action_builder(G, timeleft, nn_att)
+        attacker.att_greedy_action_builder_single(G, timeleft, nn_att)
         att_action_set = attacker.attact
-        defender.def_greedy_action_builder(G, timeleft, nn_def)
+        defender.def_greedy_action_builder_single(G, timeleft, nn_def)
         def_action_set = defender.defact
         for attack in att_action_set:
             if isinstance(attack, tuple):
